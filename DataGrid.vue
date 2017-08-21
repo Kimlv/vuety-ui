@@ -2,7 +2,7 @@
     <div class="DataGrid">
 
         <div class="DataGrid-table-wrapper">
-            <!-- NOTE: 'tablindex="1" is required to listen for key events on a table element' -->
+            <!-- NOTE: 'tabindex="0" is required to listen for key events on a table element' -->
             <table ref="table" @wheel="onWheel" @keydown="onKeyDown" tabindex="0">
                 <!-- Print headers: -->
 
