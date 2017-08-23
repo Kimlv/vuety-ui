@@ -15,7 +15,7 @@ import * as moment from 'moment'
         'preset': Number
     }
 })
-export default class Tab extends Vue {
+export default class MonthDropdown extends Vue {
 
     preset: number;
     private pMonth: number = 0;
@@ -25,7 +25,7 @@ export default class Tab extends Vue {
     }
 
     set month(v: number) {
-        if (v >= 0 && v < 11) {
+        if (v >= 0 && v <= 11) {
             this.pMonth = v;
         }
     }
