@@ -1,5 +1,5 @@
 <template>
-    <div class="DataGrid">
+    <div class="vuety-datagrid">
 
         <div class="DataGrid-table-wrapper">
             <!-- NOTE: 'tabindex="0" is required to listen for key events on a table element' -->
@@ -307,7 +307,7 @@ export default class DataGrid extends Vue {
 </script>
 
 <style lang="scss">
-div.DataGrid {
+div.vuety-datagrid {
     display: flex;
 
     /* 

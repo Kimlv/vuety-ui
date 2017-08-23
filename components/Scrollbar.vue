@@ -1,5 +1,5 @@
 <template>
-    <div ref="outer" @scroll="onScroll" class="Scrollbar">
+    <div ref="outer" @scroll="onScroll" class="vuety-scrollbar">
         <div ref="inner"></div>
     </div>
 </template>
@@ -52,7 +52,7 @@ export default class Scrollbar extends Vue {
 </script>
 
 <style lang="scss">
-div.Scrollbar {
+div.vuety-scrollbar {
     overflow-x: hidden;
     overflow-y: scroll;
     min-height: 20px;
