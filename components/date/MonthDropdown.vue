@@ -1,5 +1,5 @@
 <template>
-    <select class="vuety-month-dropdown" v-model="month" @change="onChange">
+    <select class="vuety-month-dropdown" v-model="month">
         <option v-for="(month, index) in months" v-bind:value="index">{{month}}</option>
     </select>
 </template>
@@ -27,6 +27,7 @@ export default class MonthDropdown extends Vue {
     set month(v: number) {
         if (v >= 0 && v <= 11) {
             this.pMonth = v;
+            this.$emit('monthChange', { month: this.month});
         }
     }
 
@@ -37,15 +38,12 @@ export default class MonthDropdown extends Vue {
 
     mounted() {
 
-        if (this.preset) {
-            this.month = this.preset;
-            this.month = this.preset;
+        if (this.preset && this.preset != this.month) {
+            this.month = this.preset;            
         }
     }
 
-    onChange(evt : any) {
-        this.$emit('monthChange', { month: this.month});
-    }
+    
 }
 </script>
 
