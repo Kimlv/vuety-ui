@@ -15,6 +15,7 @@ import Component from 'vue-class-component'
 })
 export default class Minimal extends Vue {
     
+    
 }
 </script>
 
