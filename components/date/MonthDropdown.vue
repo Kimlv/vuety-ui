@@ -25,9 +25,9 @@ export default class MonthDropdown extends Vue {
     }
 
     set month(v: number) {
-        if (v >= 0 && v <= 11) {
+        if (v >= 0 && v <= 11 && v != this.pMonth) {
             this.pMonth = v;
-            this.$emit('monthChange', { month: this.month});
+            this.$emit('monthChange', { month: this.pMonth});
         }
     }
 
@@ -38,7 +38,7 @@ export default class MonthDropdown extends Vue {
 
     mounted() {
 
-        if (this.preset && this.preset != this.month) {
+        if (this.preset) {
             this.month = this.preset;            
         }
     }
