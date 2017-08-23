@@ -8,7 +8,6 @@
 
         <!-- Here go the tabs: -->
         <slot/>
-
     </div>
 </template>
 
@@ -42,6 +41,8 @@ export default class Tabbed extends Vue {
         }
 
         tab.active = true;
+
+        
     }
 }
 </script>
@@ -53,6 +54,7 @@ div.vuety-tabbed {
     
     >ul {
         list-style: none;
+
 
         margin: 0;
         padding: 0;

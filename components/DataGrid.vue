@@ -80,7 +80,7 @@ export default class DataGrid extends Vue {
 
         let key = this.orderBy;
 
-        let result = sorted.sort(function (a, b) {
+        let result = sorted.sort(function(a, b) {
             // TODO: 1 Implement case-independent sort of strings
 
             let keyA = a[key];
@@ -145,7 +145,7 @@ export default class DataGrid extends Vue {
         return this.pScrollRow;
     }
 
-    set scrollRow(v) {
+    set scrollRow(v: number) {
 
         this.pScrollRow = Math.min(Math.max(0, v), this.displayedContent.length - this.numDisplayedRows);
 
