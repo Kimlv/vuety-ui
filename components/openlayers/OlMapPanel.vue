@@ -1,5 +1,8 @@
 <template>
-    <div ref="mapDiv" class="vuety-ol-map-panel"></div>
+    <div class="vuety-ol-map-panel">
+<div ref="mapDiv" class="map"></div>
+
+    </div>
 </template>
 
 <script lang="ts">
@@ -67,9 +70,14 @@ export default class OlMapPanel extends Vue {
 <style lang="scss">
 div.vuety-ol-map-panel {
 
+   
+   width:100%;  
     
-        
-    
+    >div {
+   
+        border:2px dashed #000;
+        height:100%;
+    }
 }
 </style>
 

@@ -29,6 +29,8 @@ export default class Drawer extends Vue {
     pVisible: boolean;
     peek: boolean = true;
 
+     hideTimerHandle : any;
+
     // ATTENTION: Must not be a property!
     visible(): boolean {
         return this.pVisible;
@@ -58,7 +60,7 @@ export default class Drawer extends Vue {
     onMouseLeave(evt: Event) {
 
         let me = this;
-        window.setTimeout(function() {
+        this.hideTimerHandle = window.setTimeout(function() {
 
             if (me.peek) {
                 me.setVisible(false);
@@ -68,8 +70,10 @@ export default class Drawer extends Vue {
     }
 
     onMouseOver(evt: Event) {
+        window.clearInterval(this.hideTimerHandle);
         if (!this.visible()) {
             this.setVisible(true);
+            
             this.peek = true;
         }
     }
@@ -89,7 +93,7 @@ div.vuety-drawer {
     >div {
         padding: 16px;
         
-        background-color: #ccc;
+        background-color: #eee;
         flex-grow: 0;
         flex-shrink: 0;
 
