@@ -92,13 +92,15 @@ div.vuety-drawer {
 
     padding: 16px;
 
+    // NOTE: 'position:relative' prevents the narrow 8px handle of the collapsed 
+    // sidebar from overlapping with neighbour regions, but it also causes 
+    // a 8px shift/"jump" of the neighbour content when the sidebar is shown/hidden:
+    //position:relative;
+    position:absolute;
+
     background-color: #ddd;
     height: 100%; // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
     z-index: 99;
-}
-
-div.vuety-drawer.peek {
-    position: absolute;
 }
 
 div.vuety-drawer.hidden {
@@ -108,4 +110,13 @@ div.vuety-drawer.hidden {
         display: none;
     }
 }
+
+div.vuety-drawer.visible {
+    position: relative;
+}
+
+div.vuety-drawer.peek {
+    position: absolute;
+}
+
 </style>

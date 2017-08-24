@@ -69,13 +69,10 @@ export default class OlMapPanel extends Vue {
 
 <style lang="scss">
 div.vuety-ol-map-panel {
-
    
    width:100%;  
     
-    >div {
-   
-        border:2px dashed #000;
+    >div {    
         height:100%;
     }
 }
