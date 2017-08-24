@@ -6,8 +6,14 @@
             </tr>
 
             <tr v-for="week in weeksInMonth">
-                <td v-for="day in 7" :class="dayFunc(week,day) == selectedDay ? 'selected' : ''" @click="onDayClick(dayFunc(week,day))">
-                    {{getDayOfMonth(dayFunc(week,day))}}
+                <td v-for="day in 7">
+
+                    <div v-if="isMyMonth(week,day)" :class="dayClass(week,day)" @click="onDayClick(dayFunc(week,day))">
+                        {{getDayOfMonth(dayFunc(week,day))}}
+                    </div>
+                    <div v-else class="otherMonth">
+                        {{getDayOfMonth(dayFunc(week,day))}}
+                    </div>
                 </td>
             </tr>
         </table>
@@ -23,48 +29,29 @@ import * as moment from 'moment'
 
 @Component({
     props: {
+        'year': Number,
+        'month': Number,
+        'day': Number,
 
-        'initDate': Date
 
     }
 })
 export default class DaysTable extends Vue {
 
+    year: number;
+    month: number;
+    day: number;
 
-    initDate: Date;
-    pDate: Date = new Date(Date.now());
+    pDay: number;
 
-    // ATTENTION: selecteDay is no property due to date object in-place manipulation issues.
-    selectedDay: number = 0;
 
-    @Watch('initDate')
-    bla(old: Date, n: Date) {
-        this.date = this.initDate;
-    }
-
-    get date(): Date {
-        return this.pDate;
-    }
-
-    set date(v: Date) {
-
-     //  if (v.getFullYear() != this.pDate.getFullYear() || v.getMonth() != this.pDate.getMonth() || v.getDay() != this.pDate.getDay()) {
-
-            this.pDate = v;
-
-            let oDate = this.getFirstSunday();
-            let d = moment(this.pDate);
-            this.selectedDay = d.diff(oDate, 'days');
-
-     
-       // }
-    }
+    
 
 
     get weeksInMonth(): number {
         let month_end = this.getFirstSunday().add(35, 'days').month();
 
-        if (this.date.getMonth() == month_end) {
+        if (this.getDate().getMonth() == month_end) {
             return 6;
         }
         return 5;
@@ -74,15 +61,38 @@ export default class DaysTable extends Vue {
         return moment.weekdaysShort();
     }
 
+    dayClass(week: number, day: number): string {
+
+        let result = "thisMonth ";
+
+        
+        let d = moment(this.getDate());
+
+        let diff = d.diff(this.getFirstSunday(), 'days');
+        
+
+        if (this.dayFunc(week, day) == diff) {
+            result += " selected";
+        }
+
+        return result;
+    }
+
     dayFunc(week: number, weekday: number): number {
         return (week - 1) * 7 + (weekday - 1);
     }
+
+    // ATTENTION: This must NOT be a property!!!
+    getDate(): Date {
+        return new Date(this.year, this.month, this.pDay);
+    }
+
 
 
     // ATTENTION: Defining firstDayOfMont() and getFirstSunday() as get properties won't work. 
     // Dates will be wrong, likely due to some unwanted in-place object modification.
     getFirstDayOfMonth(): any {
-        return moment({ y: this.pDate.getFullYear(), M: this.pDate.getMonth(), d: 0 });
+        return moment({ y: this.getDate().getFullYear(), M: this.getDate().getMonth(), d: 0 });
     }
 
     getFirstSunday() {
@@ -93,16 +103,44 @@ export default class DaysTable extends Vue {
         return this.getFirstSunday().add(monthDay, 'days').date();
     }
 
-    mounted() {
-        if (this.initDate) {
-            this.date = this.initDate;
+
+
+
+    created() {
+
+        // NOTE: We must do this on create(), not on mounted()
+        if (this.day) {
+            this.pDay = this.day;
         }
+
+    }
+
+
+    isMyMonth(week: number, day: number) {
+
+        let date = this.getFirstSunday().add(this.dayFunc(week, day), 'days').toDate();
+
+        return date.getMonth() == this.getDate().getMonth();
     }
 
     onDayClick(day: number) {
-        this.date = this.getFirstSunday().add(day, 'days').toDate();
 
-               this.$emit('change', { date: this.date });
+        let d = this.getFirstSunday().add(day, 'days');
+        let monthDay = - (this.getFirstDayOfMonth().diff(d, 'days')) + 1;
+
+        
+
+        this.pDay = monthDay;
+
+        
+
+        // ATTENTION: We must fire the 'change' event only on manual clicking, 
+        // not when the date is set from outside!
+        // This prevents infinite event loops.
+
+        this.$forceUpdate();
+
+        this.$emit('change', { day : this.pDay, date: this.getDate() });
     }
 }
 </script>
@@ -110,20 +148,26 @@ export default class DaysTable extends Vue {
 <style lang="scss">
 div.vuety-days-table {
     table {
-        td {
-            cursor: pointer;
+
+        div {
             border-radius: 6px;
             padding: 4px;
             text-align: right;
         }
 
-        td.selected {
+
+        div.otherMonth {
+            color: #ccc;
+        }
+
+        div.selected {
             border: 1px solid #000;
             padding: 3px;
             background-color: #88d;
             color: #fff;
         }
-        td:hover {
+        div.thisMonth:hover {
+            cursor: pointer;
             background-color: #ccc;
             color: #fff;
         }
