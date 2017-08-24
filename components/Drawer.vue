@@ -23,8 +23,8 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
 })
 export default class Drawer extends Vue {
 
-    pVisible: boolean;
-    peek: boolean = true;
+    pVisible: boolean = false;
+    peek: boolean = false;
 
     hideTimerHandle: any;
 
