@@ -1,6 +1,6 @@
 <template>   
     <div v-if="active" class="vuety-tab" role="tabpanel">        
-        <div><slot/></div>
+        <slot/>
     </div>
 </template>
 

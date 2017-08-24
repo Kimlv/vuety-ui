@@ -40,9 +40,7 @@ export default class Tabbed extends Vue {
             t.active = false;
         }
 
-        tab.active = true;
-
-        
+        tab.active = true;        
     }
 }
 </script>
