@@ -81,7 +81,7 @@ div.vuety-tabbed {
     >div {
         background-color: $background;
 
-        padding: 20px;
+        padding: 16px;
     }
 }
 </style>
