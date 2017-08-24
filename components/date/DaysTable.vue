@@ -23,29 +23,24 @@
 <script lang="ts">
 
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
-
 import * as moment from 'moment'
-
 
 @Component({
     props: {
         'year': Number,
         'month': Number,
-        'day': Number,
-
-
+        'day': Number
     }
 })
 export default class DaysTable extends Vue {
 
+    //######## BEGIN Props ########
     year: number;
     month: number;
     day: number;
+    //######## END Props ########
 
     pDay: number;
-
-
-    
 
 
     get weeksInMonth(): number {
@@ -65,11 +60,9 @@ export default class DaysTable extends Vue {
 
         let result = "thisMonth ";
 
-        
         let d = moment(this.getDate());
 
         let diff = d.diff(this.getFirstSunday(), 'days');
-        
 
         if (this.dayFunc(week, day) == diff) {
             result += " selected";
@@ -104,43 +97,34 @@ export default class DaysTable extends Vue {
     }
 
 
-
-
     created() {
 
         // NOTE: We must do this on create(), not on mounted()
         if (this.day) {
             this.pDay = this.day;
         }
-
     }
 
 
     isMyMonth(week: number, day: number) {
 
         let date = this.getFirstSunday().add(this.dayFunc(week, day), 'days').toDate();
-
         return date.getMonth() == this.getDate().getMonth();
     }
 
     onDayClick(day: number) {
 
         let d = this.getFirstSunday().add(day, 'days');
-        let monthDay = - (this.getFirstDayOfMonth().diff(d, 'days')) + 1;
+        this.pDay = - (this.getFirstDayOfMonth().diff(d, 'days')) + 1;
 
-        
-
-        this.pDay = monthDay;
-
-        
+        // NOTE: $forceUpdate() is required here to update the highlighed day, since
+        // this.pDay is not watched.
+        this.$forceUpdate();
 
         // ATTENTION: We must fire the 'change' event only on manual clicking, 
         // not when the date is set from outside!
         // This prevents infinite event loops.
-
-        this.$forceUpdate();
-
-        this.$emit('change', { day : this.pDay, date: this.getDate() });
+        this.$emit('change', { day: this.pDay, date: this.getDate() });
     }
 }
 </script>

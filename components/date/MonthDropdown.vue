@@ -12,12 +12,12 @@ import * as moment from 'moment'
 
 @Component({
     props: {
-        'preset': Number
+        'month': Number
     }
 })
 export default class MonthDropdown extends Vue {
 
-    preset: number;
+    month: number;
     private pMonth: number = 0;
 
     get value(): number {
@@ -25,9 +25,9 @@ export default class MonthDropdown extends Vue {
     }
 
 
-    @Watch('preset')
+    @Watch('month')
     bla(old: Date, n: Date) {
-        this.value = this.preset;
+        this.value = this.month;
     }
 
     set value(v: number) {
@@ -46,8 +46,8 @@ export default class MonthDropdown extends Vue {
 
     mounted() {
 
-        if (this.preset) {
-            this.value = this.preset;
+        if (this.month) {
+            this.value = this.month;
         }
     }
 
