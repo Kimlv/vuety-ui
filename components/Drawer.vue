@@ -1,15 +1,12 @@
 <template>
-    <div class="vuety-drawer">
+    <div ref="drawer" :class="cssClass()" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
 
-        <div ref="drawer" :class="cssClass()" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
+        <div ref="content">
 
-            <div ref="content">
-
-                <p>
-                    <button @click="onClick">Peek: {{peek}}</button>
-                </p>
-                <slot/>
-            </div>
+            <p>
+                <button @click="onClick">Keep open: {{!peek}}</button>
+            </p>
+            <slot/>
         </div>
 
     </div>
@@ -29,7 +26,7 @@ export default class Drawer extends Vue {
     pVisible: boolean;
     peek: boolean = true;
 
-     hideTimerHandle : any;
+    hideTimerHandle: any;
 
     // ATTENTION: Must not be a property!
     visible(): boolean {
@@ -47,7 +44,7 @@ export default class Drawer extends Vue {
         let vis = this.visible() ? 'visible' : 'hidden';
         let peek = this.peek ? 'peek' : ''
 
-        return vis + " " + peek;
+        return 'vuety-drawer ' + vis + " " + peek;
     }
 
 
@@ -73,7 +70,7 @@ export default class Drawer extends Vue {
         window.clearInterval(this.hideTimerHandle);
         if (!this.visible()) {
             this.setVisible(true);
-            
+
             this.peek = true;
         }
     }
@@ -89,31 +86,25 @@ export default class Drawer extends Vue {
 <style lang="scss">
 div.vuety-drawer {
 
-    z-index: 999;
-    >div {
-        padding: 16px;
-        
-        background-color: #eee;
-        flex-grow: 0;
-        flex-shrink: 0;
+    flex-grow: 0;
+    flex-shrink: 0;
+    flex-basis: auto;    
 
-        flex-basis: auto;
+    padding: 16px;
 
-        height: 100%;
-        width: 300px;
-    }
+    background-color: #ddd;
+    height: 100%; // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
+    z-index: 99;
+}
 
-    >div.peek {
-        position: absolute;
-    }
+div.vuety-drawer.peek {
+    position: absolute;
+}
 
-    >div.hidden {
-        width: 8px;
-        padding: 0;
-        overflow: hidden;
-    }
-
-    >div.hidden>div {
+div.vuety-drawer.hidden {
+    width: 8px !important;
+    padding: 0;    
+    * {
         display: none;
     }
 }
