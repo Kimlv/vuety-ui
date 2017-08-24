@@ -20,20 +20,29 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
 
 @Component({
     props: {
-        'title': String,
-        'visible': Boolean,
+
 
     }
 })
 export default class Drawer extends Vue {
 
-    visible: boolean;
-    peek: boolean = false;
+    pVisible: boolean;
+    peek: boolean = true;
+
+    // ATTENTION: Must not be a property!
+    visible(): boolean {
+        return this.pVisible;
+    }
+
+    setVisible(v: boolean) {
+        this.pVisible = v;
+        this.$forceUpdate();
+    }
 
     // NOTE: This must not be a get property!
     cssClass(): string {
 
-        let vis = this.visible ? 'visible' : 'hidden';
+        let vis = this.visible() ? 'visible' : 'hidden';
         let peek = this.peek ? 'peek' : ''
 
         return vis + " " + peek;
@@ -47,20 +56,28 @@ export default class Drawer extends Vue {
 
 
     onMouseLeave(evt: Event) {
-        this.$emit('mouseleave', evt);
-        /*
-                let me = this;
-                window.setTimeout(function() {
-                    console.log("Hide");
-                    me.pVisible = false;
-                    me.$forceUpdate();
-        
-                }, 1000);
-                */
+
+        let me = this;
+        window.setTimeout(function() {
+
+            if (me.peek) {
+                me.setVisible(false);
+            }
+        }, 1000);
+
     }
 
     onMouseOver(evt: Event) {
-        this.$emit('mouseover', evt);
+        if (!this.visible()) {
+            this.setVisible(true);
+            this.peek = true;
+        }
+    }
+
+
+    toggleShow() {
+        this.setVisible(!this.visible());
+        this.peek = false;
     }
 }
 </script>
@@ -71,7 +88,7 @@ div.vuety-drawer {
     z-index: 999;
     >div {
         padding: 16px;
-
+        
         background-color: #ccc;
         flex-grow: 0;
         flex-shrink: 0;
