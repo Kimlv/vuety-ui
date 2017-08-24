@@ -1,13 +1,12 @@
 <template>
-    <div class="vuety-ol-map-panel">
-<div ref="mapDiv" class="map"></div>
+    <div ref="wrapper" class="vuety-ol-map-panel">
+        <div ref="mapDiv" class="map"></div>
 
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
+import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
 // Import OpenLayers code and CSS:
 import * as ol from 'openlayers'
@@ -29,7 +28,6 @@ export default class OlMapPanel extends Vue {
     //###### END Props #######
 
     map: ol.Map = new ol.Map({});
-
 
 
     mounted() {
@@ -58,6 +56,14 @@ export default class OlMapPanel extends Vue {
         // Register map click event:
         this.map.on('singleclick', this.onMapClick);
 
+
+        // Workaround to fix map distortion when the map is embedded in a flex container
+        // and the flexible parent element is resized:
+
+        window.setInterval(() => {
+            this.map.updateSize();
+        }, 500);
+
     }
 
     onMapClick(evt: ol.MapBrowserEvent) {
@@ -69,11 +75,11 @@ export default class OlMapPanel extends Vue {
 
 <style lang="scss">
 div.vuety-ol-map-panel {
-   
-   width:100%;  
-    
-    >div {    
-        height:100%;
+
+    width: 100%;
+
+    >div {
+        height: 100%;
     }
 }
 </style>

@@ -95,7 +95,7 @@ div.vuety-day-month-picker {
         border: 1px solid #000;
         padding: 16px;
         z-index: 99;
-        box-shadow: 2px 2px 4px #000;
+        box-shadow:0px 0 5px rgba(0,0,0,0.4);
 
         select.vuety-month-dropdown {
             margin-bottom: 12px;

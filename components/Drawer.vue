@@ -1,14 +1,12 @@
 <template>
-    <div ref="drawer" :class="cssClass()" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
+    <div ref="drawer" :class="cssClass" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
 
         <div ref="content">
-
             <p>
                 <button @click="onClick">Keep open: {{!peek}}</button>
             </p>
             <slot/>
         </div>
-
     </div>
 </template>
 
@@ -17,37 +15,36 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
 
 @Component({
     props: {
-
-
+        'hidden': Boolean
     }
 })
 export default class Drawer extends Vue {
 
-    pVisible: boolean = false;
+    //######## BEGIN Props #########
+    hidden: boolean;
+    //######## END Props #########
+
     peek: boolean = false;
+    pHidden: boolean = false;
 
     hideTimerHandle: any;
 
-    // ATTENTION: Must not be a property!
-    visible(): boolean {
-        return this.pVisible;
-    }
 
-    setVisible(v: boolean) {
-        this.pVisible = v;
-        this.$forceUpdate();
-    }
+    get cssClass(): string {
 
-    // NOTE: This must not be a get property!
-    cssClass(): string {
-
-        let vis = this.visible() ? 'visible' : 'hidden';
+        let vis = this.pHidden ? 'hidden' : 'visible';
         let peek = this.peek ? 'peek' : ''
 
         return 'vuety-drawer ' + vis + " " + peek;
     }
 
 
+    mounted() {
+
+        if (typeof this.hidden != "undefined") {
+            this.pHidden = this.hidden;
+        }
+    }
 
     onClick(evt: Event) {
         this.peek = !this.peek;
@@ -56,29 +53,22 @@ export default class Drawer extends Vue {
 
     onMouseLeave(evt: Event) {
 
-        let me = this;
-        this.hideTimerHandle = window.setTimeout(function() {
+        this.hideTimerHandle = window.setTimeout(() => {
 
-            if (me.peek) {
-                me.setVisible(false);
+            if (this.peek) {
+                this.pHidden = true;
             }
-        }, 1000);
 
+        }, 1000);
     }
 
     onMouseOver(evt: Event) {
         window.clearInterval(this.hideTimerHandle);
-        if (!this.visible()) {
-            this.setVisible(true);
+        if (this.pHidden) {
 
+            this.pHidden = false;
             this.peek = true;
         }
-    }
-
-
-    toggleShow() {
-        this.setVisible(!this.visible());
-        this.peek = false;
     }
 }
 </script>
@@ -88,24 +78,23 @@ div.vuety-drawer {
 
     flex-grow: 0;
     flex-shrink: 0;
-    flex-basis: auto;    
+    flex-basis: auto;
 
     padding: 16px;
-
-    // NOTE: 'position:relative' prevents the narrow 8px handle of the collapsed 
+    box-shadow: 0px 0 5px rgba(0, 0, 0, 0.4); // NOTE: 'position:relative' prevents the narrow 8px handle of the collapsed 
     // sidebar from overlapping with neighbour regions, but it also causes 
     // a 8px shift/"jump" of the neighbour content when the sidebar is shown/hidden:
     //position:relative;
-    position:absolute;
+    position: absolute;
 
-    background-color: #ddd;
+    background-color: #f0f0f0;
     height: 100%; // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
     z-index: 99;
 }
 
 div.vuety-drawer.hidden {
     width: 8px !important;
-    padding: 0;    
+    padding: 0;
     * {
         display: none;
     }
@@ -118,5 +107,4 @@ div.vuety-drawer.visible {
 div.vuety-drawer.peek {
     position: absolute;
 }
-
 </style>
