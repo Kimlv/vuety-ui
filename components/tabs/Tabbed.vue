@@ -46,7 +46,7 @@ export default class Tabbed extends Vue {
 </script>
 
 <style lang="scss">
-$background: #f0f0f0;
+$background: #eee;
 
 div.vuety-tabbed {
     

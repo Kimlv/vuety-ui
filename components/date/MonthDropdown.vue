@@ -1,12 +1,12 @@
 <template>
-    <select class="vuety-month-dropdown" v-model="month">
+    <select class="vuety-month-dropdown" v-model="value">
         <option v-for="(month, index) in months" v-bind:value="index">{{month}}</option>
     </select>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
+
+import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
 import * as moment from 'moment'
 
@@ -20,14 +20,20 @@ export default class MonthDropdown extends Vue {
     preset: number;
     private pMonth: number = 0;
 
-    get month(): number {
+    get value(): number {
         return this.pMonth;
     }
 
-    set month(v: number) {
+
+    @Watch('preset')
+    bla(old: Date, n: Date) {
+        this.value = this.preset;
+    }
+
+    set value(v: number) {
         if (v >= 0 && v <= 11 && v != this.pMonth) {
             this.pMonth = v;
-            this.$emit('monthChange', { month: this.pMonth});
+            this.$emit('monthChange', { month: this.pMonth });
         }
     }
 
@@ -36,14 +42,16 @@ export default class MonthDropdown extends Vue {
         return moment.months();
     }
 
+
+
     mounted() {
 
         if (this.preset) {
-            this.month = this.preset;            
+            this.value = this.preset;
         }
     }
 
-    
+
 }
 </script>
 

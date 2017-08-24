@@ -15,32 +15,56 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
+
+import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
 import * as moment from 'moment'
 
 
 @Component({
     props: {
-        'year': Number,
-        'month': Number
+
+        'initDate': Date
+
     }
 })
 export default class DaysTable extends Vue {
-    year: number;
-    month: number;
+
+
+    initDate: Date;
+    pDate: Date = new Date(Date.now());
+
+    // ATTENTION: selecteDay is no property due to date object in-place manipulation issues.
     selectedDay: number = 0;
 
-
-    get date(): Date {        
-        return this.getFirstSunday().add(this.selectedDay, 'days').toDate();
+    @Watch('initDate')
+    bla(old: Date, n: Date) {
+        this.date = this.initDate;
     }
 
-    get weeksInMonth(): number {        
+    get date(): Date {
+        return this.pDate;
+    }
+
+    set date(v: Date) {
+
+     //  if (v.getFullYear() != this.pDate.getFullYear() || v.getMonth() != this.pDate.getMonth() || v.getDay() != this.pDate.getDay()) {
+
+            this.pDate = v;
+
+            let oDate = this.getFirstSunday();
+            let d = moment(this.pDate);
+            this.selectedDay = d.diff(oDate, 'days');
+
+     
+       // }
+    }
+
+
+    get weeksInMonth(): number {
         let month_end = this.getFirstSunday().add(35, 'days').month();
 
-        if (this.month == month_end) {
+        if (this.date.getMonth() == month_end) {
             return 6;
         }
         return 5;
@@ -58,26 +82,28 @@ export default class DaysTable extends Vue {
     // ATTENTION: Defining firstDayOfMont() and getFirstSunday() as get properties won't work. 
     // Dates will be wrong, likely due to some unwanted in-place object modification.
     getFirstDayOfMonth(): any {
-        return moment({ y: this.year, M: this.month, d: 0 });
+        return moment({ y: this.pDate.getFullYear(), M: this.pDate.getMonth(), d: 0 });
     }
 
     getFirstSunday() {
         return this.getFirstDayOfMonth().day("Sunday");
     }
 
-    getDayOfMonth(monthDay: number): number {        
-        return this.getFirstSunday().add(monthDay, 'days').date();        
+    getDayOfMonth(monthDay: number): number {
+        return this.getFirstSunday().add(monthDay, 'days').date();
+    }
+
+    mounted() {
+        if (this.initDate) {
+            this.date = this.initDate;
+        }
     }
 
     onDayClick(day: number) {
-        this.selectedDay = day;
+        this.date = this.getFirstSunday().add(day, 'days').toDate();
 
-        console.log(this.date);
+               this.$emit('change', { date: this.date });
     }
-
-
-
-
 }
 </script>
 
@@ -92,7 +118,9 @@ div.vuety-days-table {
         }
 
         td.selected {
-            background-color: #666;
+            border: 1px solid #000;
+            padding: 3px;
+            background-color: #88d;
             color: #fff;
         }
         td:hover {
