@@ -1,10 +1,8 @@
 <template>
     <div ref="drawer" :class="cssClass" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
-
+        <button @click="onClick">Keep Open: {{!peek}}</button>
         <div ref="content">
-            <p>
-                <button @click="onClick">Keep open: {{!peek}}</button>
-            </p>
+
             <slot/>
         </div>
     </div>
@@ -80,7 +78,7 @@ div.vuety-drawer {
     flex-shrink: 0;
     flex-basis: auto;
 
-    padding: 16px;
+
     box-shadow: 0px 0 5px rgba(0, 0, 0, 0.4); // NOTE: 'position:relative' prevents the narrow 8px handle of the collapsed 
     // sidebar from overlapping with neighbour regions, but it also causes 
     // a 8px shift/"jump" of the neighbour content when the sidebar is shown/hidden:
@@ -90,6 +88,11 @@ div.vuety-drawer {
     background-color: #f0f0f0;
     height: 100%; // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
     z-index: 99;
+
+    > button {
+        margin:8px;
+        
+    }
 }
 
 div.vuety-drawer.hidden {
