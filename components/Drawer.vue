@@ -1,11 +1,13 @@
 <template>
     <div class="vuety-drawer">
 
-        <div ref="drawer" :class="cssClass()" @mouseleave="onMouseLeave">
-
-            <button @click="onClick">Peek: {{peek}}</button>
+        <div ref="drawer" :class="cssClass()" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
 
             <div ref="content">
+
+                <p>
+                    <button @click="onClick">Peek: {{peek}}</button>
+                </p>
                 <slot/>
             </div>
         </div>
@@ -20,18 +22,13 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
     props: {
         'title': String,
         'visible': Boolean,
-        
+
     }
 })
 export default class Drawer extends Vue {
 
     visible: boolean;
-
-    
-
     peek: boolean = false;
-
-   
 
     // NOTE: This must not be a get property!
     cssClass(): string {
@@ -42,7 +39,6 @@ export default class Drawer extends Vue {
         return vis + " " + peek;
     }
 
- 
 
 
     onClick(evt: Event) {
@@ -52,15 +48,19 @@ export default class Drawer extends Vue {
 
     onMouseLeave(evt: Event) {
         this.$emit('mouseleave', evt);
-/*
-        let me = this;
-        window.setTimeout(function() {
-            console.log("Hide");
-            me.pVisible = false;
-            me.$forceUpdate();
+        /*
+                let me = this;
+                window.setTimeout(function() {
+                    console.log("Hide");
+                    me.pVisible = false;
+                    me.$forceUpdate();
+        
+                }, 1000);
+                */
+    }
 
-        }, 1000);
-        */
+    onMouseOver(evt: Event) {
+        this.$emit('mouseover', evt);
     }
 }
 </script>
@@ -68,6 +68,7 @@ export default class Drawer extends Vue {
 <style lang="scss">
 div.vuety-drawer {
 
+    z-index: 999;
     >div {
         padding: 16px;
 
@@ -79,7 +80,6 @@ div.vuety-drawer {
 
         height: 100%;
         width: 300px;
-        z-index: 999;
     }
 
     >div.peek {
@@ -87,6 +87,12 @@ div.vuety-drawer {
     }
 
     >div.hidden {
+        width: 8px;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    >div.hidden>div {
         display: none;
     }
 }
