@@ -131,6 +131,7 @@ export default class DaysTable extends Vue {
 
 <style lang="scss">
 div.vuety-days-table {
+
     table {
 
         div {

@@ -74,6 +74,8 @@ export default class DayMonthPicker extends Vue {
 <style lang="scss">
 div.vuety-day-month-picker {
 
+    
+
     // NOTE: 'inline-block' (as opposed to 'inline') is required
     // to set the horizontal position of the absolutely positioned popup to
     // the horizontal position of the "input field"
@@ -92,7 +94,7 @@ div.vuety-day-month-picker {
         background-color: #fff;
         border: 1px solid #000;
         padding: 16px;
-        z-index: 99;
+        z-index: 999;
         box-shadow: 2px 2px 4px #000;
 
         select.vuety-month-dropdown {
