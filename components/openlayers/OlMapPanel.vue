@@ -1,8 +1,5 @@
 <template>
-    <div ref="wrapper" class="vuety-ol-map-panel">
-        <div ref="mapDiv" class="map"></div>
-
-    </div>
+    <div ref="mapDiv" class="vuety-ol-map-panel" />
 </template>
 
 <script lang="ts">
@@ -29,9 +26,7 @@ export default class OlMapPanel extends Vue {
 
     map: ol.Map = new ol.Map({});
 
-
     mounted() {
-
         let zoom = this.zoom ? this.zoom : 1;
         let lon = this.lon ? this.lon : 0;
         let lat = this.lat ? this.lat : 0;
@@ -44,7 +39,6 @@ export default class OlMapPanel extends Vue {
                 new ol.layer.Tile({
                     source: new ol.source.OSM()
                 })
-
             ],
             view: new ol.View({
                 center: ol.proj.fromLonLat([lon, lat]),
@@ -63,24 +57,10 @@ export default class OlMapPanel extends Vue {
         window.setInterval(() => {
             this.map.updateSize();
         }, 500);
-
     }
 
     onMapClick(evt: ol.MapBrowserEvent) {
         this.$emit('mapClick', evt);
     }
 }
-
 </script>
-
-<style lang="scss">
-div.vuety-ol-map-panel {
-
-    width: 100%;
-
-    >div {
-        height: 100%;
-    }
-}
-</style>
-
