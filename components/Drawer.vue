@@ -78,20 +78,27 @@ div.vuety-drawer {
     flex-shrink: 0;
     flex-basis: auto;
 
-
-    box-shadow: 0px 0 5px rgba(0, 0, 0, 0.4); // NOTE: 'position:relative' prevents the narrow 8px handle of the collapsed 
+    box-shadow: 0px 0 5px rgba(0, 0, 0, 0.4); 
+    
+    // NOTE: 'position:relative' prevents the narrow 8px handle of the collapsed 
     // sidebar from overlapping with neighbour regions, but it also causes 
     // a 8px shift/"jump" of the neighbour content when the sidebar is shown/hidden:
     //position:relative;
     position: absolute;
 
     background-color: #f0f0f0;
-    height: 100%; // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
+
+    // Drawer default width:
+    width:250px;
+
+    // ATTENTION: 'height:100%' is required to keep the 100% height with absolute positioning (peek mode):
+    height:100%;
+    
+    // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
     z-index: 99;
 
     > button {
-        margin:8px;
-        
+        margin:8px;        
     }
 }
 
