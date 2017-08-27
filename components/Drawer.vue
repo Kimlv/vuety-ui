@@ -2,7 +2,6 @@
     <div ref="drawer" :class="cssClass" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
         <button v-if="showPeekSwitch" @click="onClick">Keep Open: {{!peek}}</button>
         <div ref="content">
-
             <slot/>
         </div>
     </div>
@@ -27,7 +26,7 @@ export default class Drawer extends Vue {
     
     peekAutoCloseDelay_ms: number = 1000;
 
-    hideTimerHandle: any;
+    private hideTimerHandle: any;
 
 
     get cssClass(): string {
@@ -39,6 +38,7 @@ export default class Drawer extends Vue {
     }
 
     created() {
+        // Set hidden state from prop:
         this.pHidden = this.hidden;
     }
 
