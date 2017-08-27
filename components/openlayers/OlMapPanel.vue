@@ -5,6 +5,8 @@
 <script lang="ts">
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
+import * as eb from './OlEventBus'
+
 // Import OpenLayers code and CSS:
 import * as ol from 'openlayers'
 import 'openlayers/css/ol.css'
@@ -24,7 +26,13 @@ export default class OlMapPanel extends Vue {
     zoom: number;
     //###### END Props #######
 
-    map: ol.Map = new ol.Map({});
+    private map: ol.Map = new ol.Map({});
+
+    public getMap() {
+        return this.map;
+    }
+
+    
 
     mounted() {
         let zoom = this.zoom ? this.zoom : 1;
@@ -37,8 +45,10 @@ export default class OlMapPanel extends Vue {
             layers: [
 
                 new ol.layer.Tile({
-                    source: new ol.source.OSM()
+                    source: new ol.source.OSM(),
+                    
                 })
+                
             ],
             view: new ol.View({
                 center: ol.proj.fromLonLat([lon, lat]),
@@ -57,9 +67,16 @@ export default class OlMapPanel extends Vue {
         window.setInterval(() => {
             this.map.updateSize();
         }, 500);
+
+        eb.bus.$emit('hello', this);
     }
 
+   
+
     onMapClick(evt: ol.MapBrowserEvent) {
+
+        
+
         this.$emit('mapClick', evt);
     }
 }
