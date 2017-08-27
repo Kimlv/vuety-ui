@@ -1,6 +1,6 @@
 <template>
     <div ref="drawer" :class="cssClass" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
-        <button @click="onClick">Keep Open: {{!peek}}</button>
+        <button v-if="peekSwitch" @click="onClick">Keep Open: {{!peek}}</button>
         <div ref="content">
 
             <slot/>
@@ -13,13 +13,15 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
 
 @Component({
     props: {
-        'hidden': Boolean
+        'hidden': Boolean,
+        'peekSwitch': Boolean
     }
 })
 export default class Drawer extends Vue {
 
     //######## BEGIN Props #########
     hidden: boolean;
+    peekSwitch: boolean;
     //######## END Props #########
 
     peek: boolean = false;
