@@ -1,6 +1,6 @@
 <template>
     <div ref="drawer" :class="cssClass" @mouseover="onMouseOver" @mouseleave="onMouseLeave">
-        <button v-if="peekSwitch" @click="onClick">Keep Open: {{!peek}}</button>
+        <button v-if="showPeekSwitch" @click="onClick">Keep Open: {{!peek}}</button>
         <div ref="content">
 
             <slot/>
@@ -11,21 +11,21 @@
 <script lang="ts">
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
-@Component({
-    props: {
-        'hidden': Boolean,
-        'peekSwitch': Boolean
-    }
-})
+@Component
 export default class Drawer extends Vue {
 
     //######## BEGIN Props #########
+    @Prop({ default: false })
     hidden: boolean;
-    peekSwitch: boolean;
+
+    @Prop({ default: true })
+    showPeekSwitch: boolean;
     //######## END Props #########
 
     peek: boolean = false;
     pHidden: boolean = false;
+    
+    peekAutoCloseDelay_ms: number = 1000;
 
     hideTimerHandle: any;
 
@@ -38,12 +38,8 @@ export default class Drawer extends Vue {
         return 'vuety-drawer ' + vis + " " + peek;
     }
 
-
-    mounted() {
-
-        if (typeof this.hidden != "undefined") {
-            this.pHidden = this.hidden;
-        }
+    created() {
+        this.pHidden = this.hidden;
     }
 
     onClick(evt: Event) {
@@ -59,7 +55,7 @@ export default class Drawer extends Vue {
                 this.pHidden = true;
             }
 
-        }, 1000);
+        }, this.peekAutoCloseDelay_ms);
     }
 
     onMouseOver(evt: Event) {
@@ -80,27 +76,19 @@ div.vuety-drawer {
     flex-shrink: 0;
     flex-basis: auto;
 
-    box-shadow: 0px 0 5px rgba(0, 0, 0, 0.4); 
-    
-    // NOTE: 'position:relative' prevents the narrow 8px handle of the collapsed 
+    box-shadow: 0px 0 5px rgba(0, 0, 0, 0.4); // NOTE: 'position:relative' prevents the narrow 8px handle of the collapsed 
     // sidebar from overlapping with neighbour regions, but it also causes 
     // a 8px shift/"jump" of the neighbour content when the sidebar is shown/hidden:
     //position:relative;
     position: absolute;
 
-    background-color: #f0f0f0;
-
-    // Drawer default width:
-    width:250px;
-
-    // ATTENTION: 'height:100%' is required to keep the 100% height with absolute positioning (peek mode):
-    height:100%;
-    
-    // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
+    background-color: #f0f0f0; // Drawer default width:
+    width: 250px; // ATTENTION: 'height:100%' is required to keep the 100% height with absolute positioning (peek mode):
+    height: 100%; // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
     z-index: 99;
 
-    > button {
-        margin:8px;        
+    >button {
+        margin: 8px;
     }
 }
 
