@@ -21,12 +21,11 @@ import DaysTable from './DaysTable.vue'
         'vt-days-table': DaysTable,
         'vt-month-dropdown': MonthDropdown
     },
-
-    props: {
-        
-    }
 })
 export default class DayMonthPicker extends Vue {
+
+    @Prop()
+    date: Date;
 
     month: number = 0;
     year: number = 2017;
@@ -38,14 +37,22 @@ export default class DayMonthPicker extends Vue {
         return new Date(this.year, this.month, this.day);
     }
 
-    mounted() {
+    created() {
 
-        let date = new Date(Date.now());
+        let date = null;
+
+        if (this.date instanceof Date) {
+            date = this.date;
+        }
+        else {
+            date = new Date(Date.now());
+        }
 
         this.month = date.getMonth();
         this.year = date.getFullYear();
         this.day = date.getDate();
     }
+
 
     onClick() {
 
@@ -59,43 +66,40 @@ export default class DayMonthPicker extends Vue {
         let popup = <HTMLDivElement>this.$refs.popup;
         popup.style.display = 'none';
 
-        this.$emit('change', {date : this.getDate()});
+        this.$emit('change', { date: this.getDate() });
     }
 
     onMonthChange(evt: any) {
         this.month = evt.month;
 
-        this.$emit('change', {date : this.getDate()});
+        this.$emit('change', { date: this.getDate() });
     }
-
 }
 </script>
 
 <style lang="scss">
 div.vuety-day-month-picker {
 
-    
-
     // NOTE: 'inline-block' (as opposed to 'inline') is required
     // to set the horizontal position of the absolutely positioned popup to
     // the horizontal position of the "input field"
     display: inline-block;
-    
+
 
     span.field {
-        background-color:#fff;
-        border: 2px inset;        
+        background-color: #fff;
+        border: 2px inset;
         padding: 2px;
     }
     div.popup {
-        position:absolute;
-        
+        position: absolute;
+
         display: none;
         background-color: #fff;
         border: 1px solid #000;
         padding: 16px;
         z-index: 99;
-        box-shadow:0px 0 5px rgba(0,0,0,0.4);
+        box-shadow: 0px 0 5px rgba(0, 0, 0, 0.4);
 
         select.vuety-month-dropdown {
             margin-bottom: 12px;
