@@ -1,9 +1,20 @@
 <template>
-    <svg class="vuety-analog-gauge" viewBox="0 0 200 100">
+    <svg class="vuety-analog-gauge" viewBox="0 0 200 115">
 
-        <circle cx="100" cy="100" r="100" fill="rgb(200,200,200)" />
+        <g transform="translate(100,100)">
+            <!-- The background:-->
+            <circle r="100" fill="rgb(200,200,200)" />
 
-        <line x1="0" y1="0" x2="-90" y2="0" style="stroke:rgb(0,0,0);stroke-width:4" :transform="needleTransform" />
+            <!-- ####### BEGIN The labels ####### -->
+            <g v-for="label in labels" :transform="'translate(' + label.x + ',' + label.y + ')'">
+                <text alignment-baseline="central" font-size="13" text-anchor="middle">{{label.v}}</text>
+            </g>
+            <!-- ####### END The labels ####### -->
+
+            <!-- The needle: -->
+            <line x1="0" y1="0" x2="-70" y2="0" style="stroke:rgb(200,0,0);stroke-width:3" :transform="'rotate(' + this.needleAngle_deg + ')'" />
+            <circle r="8" fill="rgb(200,0,0)" />
+        </g>
     </svg>
 </template>
 
@@ -15,50 +26,89 @@ export default class AnalogGauge extends Vue {
 
     //########## BEGIN Props ##########
     @Prop({ default: 1 })
-    max : number;
+    max: number;
 
     @Prop({ default: 0 })
-    min : number;
+    min: number;
 
     @Prop({ default: 0 })
     value: number;
     //########## END Props ##########
 
-    updateIntervalHandle : number;
-    updateInterval_ms : number = 50;
+    updateIntervalHandle: number = -1;
+    updateInterval_ms: number = 50;
 
-    pNeedleAngle_deg: number = 0;
+    needleAngle_deg: number = 0;
 
-    maxAngle_deg : number = 180;
+    cfg_maxAngle_deg: number = 180;
+    cfg_minAngle_deg: number = 0;
+    cfg_numLabelSteps: number = 10;
+    cfg_labelRadius: number = 83;
+
+
+    @Watch('value')
+    onValueChange(n: number, o: number) {
+        
+        // Set up update timer if it isn't already set up:
+        if (this.updateIntervalHandle == -1) {
+            this.updateIntervalHandle = window.setInterval(this.updateNeedle, this.updateInterval_ms);
+        }
+    }
 
     //############### BEGIN get/set properties #################
-    get needleAngle_deg() : number {
-        return this.pNeedleAngle_deg;
-    }
+    get labels(): Array<any> {
 
-    set needleAngle_deg(v : number) {
-        this.pNeedleAngle_deg = Math.max(0, Math.min(v, this.maxAngle_deg));
-    }
+        let result = new Array();
 
-    
-    get needleTransform(): string {
-        return "translate(100,100) rotate(" + this.needleAngle_deg + ")";
+        let stepSize = (this.max - this.min) / this.cfg_numLabelSteps;
+        for (let ii = this.min; ii <= this.max; ii += stepSize) {
+
+            let a = (this.cfg_minAngle_deg + this.getPercent(ii) * (this.cfg_maxAngle_deg - this.cfg_minAngle_deg)) * (Math.PI / 180.0);
+
+            result.push({
+                x: -Math.cos(a) * this.cfg_labelRadius,
+                y: -Math.sin(a) * this.cfg_labelRadius,
+                v: ii
+            });
+        }
+
+        return result;
     }
     //############### END get/set properties #################
 
     created() {
 
+        this.needleAngle_deg = this.cfg_minAngle_deg;
+
         if (this.max <= this.min) {
             console.warn("Vuety UI Analog Gauge: 'min' should be smaller than 'max'!");
         }
 
-        // Set up update timer:
-        this.updateIntervalHandle = window.setInterval(() => {
+        // NOTE: Initial set-up of the update interval is required, 
+        // the @Watch('value') is not enough!
+        this.updateIntervalHandle = window.setInterval(this.updateNeedle, this.updateInterval_ms);
+    }
 
-            let targetAngle = ((this.value - this.min) / (this.max - this.min)) * this.maxAngle_deg;
+    getPercent(v: number): number {
+        return ((v - this.min) / (this.max - this.min));
+    }
 
-            this.needleAngle_deg += (targetAngle - this.needleAngle_deg) * 0.1;
-        }, this.updateInterval_ms);
+    updateNeedle() {
+
+        let targetAngle_deg = this.cfg_minAngle_deg + this.getPercent(this.value) * (this.cfg_maxAngle_deg - this.cfg_minAngle_deg);
+
+        let diff = targetAngle_deg - this.needleAngle_deg;
+
+        if (Math.abs(diff) < 0.1) {
+            this.needleAngle_deg = targetAngle_deg;
+
+            // Clear update interval:
+            window.clearInterval(this.updateIntervalHandle);
+            this.updateIntervalHandle = -1;
+        }
+        else {
+            this.needleAngle_deg += diff * 0.1;
+        }
     }
 }
 </script>
