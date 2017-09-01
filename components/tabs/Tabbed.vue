@@ -16,11 +16,7 @@ import Vue from 'vue'
 import Component from 'vue-class-component'
 import Tab from './Tab.vue';
 
-@Component({
-    props: {
-        'name': String
-    }
-})
+@Component({})
 export default class Tabbed extends Vue {
 
     tabs: Array<Tab> = [];
@@ -40,7 +36,7 @@ export default class Tabbed extends Vue {
             t.active = false;
         }
 
-        tab.active = true;        
+        tab.active = true;
     }
 }
 </script>
@@ -49,11 +45,9 @@ export default class Tabbed extends Vue {
 $background: #eee;
 
 div.vuety-tabbed {
-    
+
     >ul {
         list-style: none;
-
-
         margin: 0;
         padding: 0;
         >li {

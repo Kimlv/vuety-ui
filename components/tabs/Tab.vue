@@ -1,21 +1,19 @@
-<template>   
-    <div v-if="active" class="vuety-tab" role="tabpanel">        
+<template>
+    <div v-if="active" class="vuety-tab" role="tabpanel">
         <slot/>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
+import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
-@Component({
-    props: {
-        'title': String
-    }
-})
+@Component({})
 export default class Tab extends Vue {
+
+    @Prop({ default: "Tab" })
+    title: string;
+
     active: Boolean = false;
-    title: string;   
 }
 </script>
 
