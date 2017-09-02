@@ -6,10 +6,14 @@
             <circle r="100" fill="rgb(200,200,200)" />
 
             <!-- ####### BEGIN The labels ####### -->
-            <g v-for="label in labels" :transform="'translate(' + label.x + ',' + label.y + ')'">
-                <text alignment-baseline="central" font-size="13" text-anchor="middle">{{label.v}}</text>
+            <g v-for="marking in markings" :transform="'translate(' + marking.x + ',' + marking.y + ')'">
+                <text alignment-baseline="central" font-size="13" text-anchor="middle">{{marking.v}}</text>
             </g>
             <!-- ####### END The labels ####### -->
+
+            <text y="-25" font-size="16" font-weight="bold" text-anchor="middle">
+                {{label}}
+            </text>
 
             <!-- The needle: -->
             <line x1="0" y1="0" x2="-70" y2="0" style="stroke:rgb(200,0,0);stroke-width:3" :transform="'rotate(' + this.needleAngle_deg + ')'" />
@@ -25,6 +29,9 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
 export default class AnalogGauge extends Vue {
 
     //########## BEGIN Props ##########
+    @Prop({ default: "" })
+    label : string;
+
     @Prop({ default: 1 })
     max: number;
 
@@ -48,7 +55,7 @@ export default class AnalogGauge extends Vue {
 
     @Watch('value')
     onValueChange(n: number, o: number) {
-        
+
         // Set up update timer if it isn't already set up:
         if (this.updateIntervalHandle == -1) {
             this.updateIntervalHandle = window.setInterval(this.updateNeedle, this.updateInterval_ms);
@@ -56,7 +63,7 @@ export default class AnalogGauge extends Vue {
     }
 
     //############### BEGIN get/set properties #################
-    get labels(): Array<any> {
+    get markings(): Array<any> {
 
         let result = new Array();
 
