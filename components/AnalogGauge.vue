@@ -13,7 +13,7 @@
             </text>
 
             <!-- The label: -->
-            <text class="label" y="-25">
+            <text class="label" y="-22">
                 {{label}}
             </text>
 
@@ -105,7 +105,7 @@ export default class AnalogGauge extends Vue {
 
         let diff = targetAngle_deg - this.needleAngle_deg;
 
-        if (Math.abs(diff) < 0.1) {
+        if (Math.abs(diff) < (this.max - this.min) * 0.001) {
             this.needleAngle_deg = targetAngle_deg;
         }
         else {
