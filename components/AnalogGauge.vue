@@ -56,7 +56,6 @@ export default class AnalogGauge extends Vue {
     //######## END Configuration members #########
 
     //######## BEGIN State members #########
-    updateIntervalHandle: number = -1;
     updateInterval_ms: number = 50;
     needleAngle_deg: number = 0;
     //######## END State members #########
@@ -84,11 +83,7 @@ export default class AnalogGauge extends Vue {
 
     @Watch('value')
     onValueChange(n: number, o: number) {
-
-        // Set up update timer if it isn't already set up:
-        if (this.updateIntervalHandle == -1) {
-            this.updateIntervalHandle = window.setInterval(this.updateNeedle, this.updateInterval_ms);
-        }
+        this.updateNeedle();
     }
 
     created() {
@@ -98,10 +93,6 @@ export default class AnalogGauge extends Vue {
         if (this.max <= this.min) {
             console.warn("Vuety UI Analog Gauge: 'min' should be smaller than 'max'!");
         }
-
-        // NOTE: Initial set-up of the update interval is required, 
-        // the @Watch('value') alone is not enough!
-        this.updateIntervalHandle = window.setInterval(this.updateNeedle, this.updateInterval_ms);
     }
 
     getPercent(v: number): number {
@@ -116,13 +107,10 @@ export default class AnalogGauge extends Vue {
 
         if (Math.abs(diff) < 0.1) {
             this.needleAngle_deg = targetAngle_deg;
-
-            // Clear update interval:
-            window.clearInterval(this.updateIntervalHandle);
-            this.updateIntervalHandle = -1;
         }
         else {
-            this.needleAngle_deg += diff * 0.1;
+            this.needleAngle_deg += diff * 0.01;
+            window.setTimeout(this.updateNeedle, this.updateInterval_ms);
         }
     }
 }
