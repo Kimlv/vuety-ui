@@ -1,5 +1,5 @@
 <template>
-    <svg class="vuety-analog-gauge" viewBox="0 0 200 115">
+    <svg class="analog-gauge" viewBox="0 0 200 115">
 
         <!--##### BEGIN Group to shift coordinate origin to needle pivot point ##### -->
         <g transform="translate(100,100)">
@@ -48,19 +48,17 @@ export default class AnalogGauge extends Vue {
     value: number;
     //########## END Props ##########
 
-    //######## BEGIN Configuration members #########
-    cfg_maxAngle_deg: number = 180;
-    cfg_minAngle_deg: number = 0;
-    cfg_numMarkingSteps: number = 10;
-    cfg_markingsRadius: number = 83;
-    //######## END Configuration members #########
+    getFraction(v: number): number {
+        return ((v - this.min) / (this.max - this.min));
+    }
 
-    //######## BEGIN State members #########
-    updateInterval_ms: number = 50;
-    needleAngle_deg: number = 0;
-    //######## END State members #########
+    get needleAngle_deg(): number {
+        return this.getFraction(this.value) * 180;
+    }
 
-    //############### BEGIN get/set properties #################
+    cfg_labelRadius : number = 85;
+    cfg_numMarkingSteps = 10;
+
     get markings(): Array<any> {
 
         let result = new Array();
@@ -68,61 +66,25 @@ export default class AnalogGauge extends Vue {
         let stepSize = (this.max - this.min) / this.cfg_numMarkingSteps;
         for (let ii = this.min; ii <= this.max; ii += stepSize) {
 
-            let a = (this.cfg_minAngle_deg + this.getFraction(ii) * (this.cfg_maxAngle_deg - this.cfg_minAngle_deg)) * (Math.PI / 180.0);
+            let a = this.getFraction(ii) * Math.PI;
 
             result.push({
-                x: -Math.cos(a) * this.cfg_markingsRadius,
-                y: -Math.sin(a) * this.cfg_markingsRadius,
+                x: -Math.cos(a) * this.cfg_labelRadius,
+                y: -Math.sin(a) * this.cfg_labelRadius,
                 v: ii
             });
         }
 
         return result;
     }
-    //############### END get/set properties #################
-
-    created() {
-
-        this.needleAngle_deg = this.cfg_minAngle_deg;
-
-        if (this.max <= this.min) {
-            console.warn("Vuety UI Analog Gauge: 'min' should be smaller than 'max'!");
-        }
-    }
-
-    getFraction(v: number): number {
-        return ((v - this.min) / (this.max - this.min));
-    }
-
-    @Watch('value')
-    updateNeedle() {
-
-        let targetAngle_deg = this.cfg_minAngle_deg + this.getFraction(this.value) * (this.cfg_maxAngle_deg - this.cfg_minAngle_deg);
-
-        let diff = targetAngle_deg - this.needleAngle_deg;
-
-        if (Math.abs(diff) < (this.max - this.min) * 0.001) {
-            this.needleAngle_deg = targetAngle_deg;
-        }
-        else {
-            this.needleAngle_deg += diff * 0.01;
-            window.setTimeout(this.updateNeedle, this.updateInterval_ms);
-        }
-    }
 }
 </script>
 
 <style lang="scss">
-svg.vuety-analog-gauge {
+svg.analog-gauge {
 
     circle.background {
         fill: rgb(200, 200, 200)
-    }
-
-    text.marking {
-        font-size: 13.5px;
-        dominant-baseline: central;
-        text-anchor: middle;
     }
 
     text.label {
@@ -134,6 +96,11 @@ svg.vuety-analog-gauge {
     g.needle {
         fill: rgb(200, 0, 0)
     }
+
+    text.marking {
+        font-size: 13.5px;
+        dominant-baseline: central;
+        text-anchor: middle;
+    }
 }
 </style>
-
