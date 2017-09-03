@@ -1,24 +1,30 @@
 <template>
     <svg class="vuety-analog-gauge" viewBox="0 0 200 115">
 
+        <!--##### BEGIN Group to shift coordinate origin to needle pivot point ##### -->
         <g transform="translate(100,100)">
-            <!-- The background:-->
-            <circle r="100" fill="rgb(200,200,200)" />
 
-            <!-- ####### BEGIN The labels ####### -->
-            <g v-for="marking in markings" :transform="'translate(' + marking.x + ',' + marking.y + ')'">
-                <text alignment-baseline="central" font-size="13" text-anchor="middle">{{marking.v}}</text>
-            </g>
-            <!-- ####### END The labels ####### -->
+            <!-- The background disk:-->
+            <circle class="background" r="100" />
 
-            <text y="-25" font-size="16" font-weight="bold" text-anchor="middle">
+            <!-- The number markings: -->
+            <text v-for="marking in markings" class="marking" :transform="'translate(' + marking.x + ',' + marking.y + ')'">
+                {{marking.v}}
+            </text>
+
+            <!-- The label: -->
+            <text class="label" y="-25">
                 {{label}}
             </text>
 
             <!-- The needle: -->
-            <line x1="0" y1="0" x2="-70" y2="0" style="stroke:rgb(200,0,0);stroke-width:3" :transform="'rotate(' + this.needleAngle_deg + ')'" />
-            <circle r="8" fill="rgb(200,0,0)" />
+            <g class="needle" :transform="'rotate(' + needleAngle_deg + ')'">
+                <polygon points="0,-7 -70,0 0,7" />
+                <circle r="7" />
+            </g>
+
         </g>
+        <!--##### END Group to shift coordinate origin to needle pivot point ##### -->
     </svg>
 </template>
 
@@ -30,7 +36,7 @@ export default class AnalogGauge extends Vue {
 
     //########## BEGIN Props ##########
     @Prop({ default: "" })
-    label : string;
+    label: string;
 
     @Prop({ default: 1 })
     max: number;
@@ -42,25 +48,18 @@ export default class AnalogGauge extends Vue {
     value: number;
     //########## END Props ##########
 
-    updateIntervalHandle: number = -1;
-    updateInterval_ms: number = 50;
-
-    needleAngle_deg: number = 0;
-
+    //######## BEGIN Configuration members #########
     cfg_maxAngle_deg: number = 180;
     cfg_minAngle_deg: number = 0;
     cfg_numLabelSteps: number = 10;
     cfg_labelRadius: number = 83;
+    //######## END Configuration members #########
 
-
-    @Watch('value')
-    onValueChange(n: number, o: number) {
-
-        // Set up update timer if it isn't already set up:
-        if (this.updateIntervalHandle == -1) {
-            this.updateIntervalHandle = window.setInterval(this.updateNeedle, this.updateInterval_ms);
-        }
-    }
+    //######## BEGIN State members #########
+    updateIntervalHandle: number = -1;
+    updateInterval_ms: number = 50;
+    needleAngle_deg: number = 0;
+    //######## END State members #########
 
     //############### BEGIN get/set properties #################
     get markings(): Array<any> {
@@ -83,6 +82,15 @@ export default class AnalogGauge extends Vue {
     }
     //############### END get/set properties #################
 
+    @Watch('value')
+    onValueChange(n: number, o: number) {
+
+        // Set up update timer if it isn't already set up:
+        if (this.updateIntervalHandle == -1) {
+            this.updateIntervalHandle = window.setInterval(this.updateNeedle, this.updateInterval_ms);
+        }
+    }
+
     created() {
 
         this.needleAngle_deg = this.cfg_minAngle_deg;
@@ -92,7 +100,7 @@ export default class AnalogGauge extends Vue {
         }
 
         // NOTE: Initial set-up of the update interval is required, 
-        // the @Watch('value') is not enough!
+        // the @Watch('value') alone is not enough!
         this.updateIntervalHandle = window.setInterval(this.updateNeedle, this.updateInterval_ms);
     }
 
@@ -121,6 +129,27 @@ export default class AnalogGauge extends Vue {
 </script>
 
 <style lang="scss">
+svg.vuety-analog-gauge {
 
+    circle.background {
+        fill: rgb(200, 200, 200)
+    }
+
+    text.marking {
+        font-size: 13.5px;
+        dominant-baseline: central;
+        text-anchor: middle;
+    }
+
+    text.label {
+        font-size: 16px;
+        font-weight: bold;
+        text-anchor: middle;
+    }
+
+    g.needle {
+        fill: rgb(200, 0, 0)
+    }
+}
 </style>
 
