@@ -1,11 +1,13 @@
 <template>
     <div class="vuety-days-table">
+        {{min}}<br/>
+        {{max}}
         <table>
             <tr>
-                <th v-for="weekday in weekdaysShort">{{weekday}}</th>
+                <th v-for="weekday in weekdaysShort()">{{weekday}}</th>
             </tr>
 
-            <tr v-for="week in weeksInMonth">
+            <tr v-for="week in weeksInMonth()">
                 <td v-for="day in 7">
 
                     <div v-if="isMyMonth(week,day)" :class="dayClass(week,day)" @click="onDayClick(dayFunc(week,day))">
@@ -25,42 +27,48 @@
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 import * as moment from 'moment'
 
-@Component({
-    props: {
-        'year': Number,
-        'month': Number,
-        'day': Number
-    }
-})
+@Component({})
 export default class DaysTable extends Vue {
 
     //######## BEGIN Props ########
-    year: number;
-    month: number;
-    day: number;
+    @Prop({default : new Date()})
+    date: Date;
+
+    @Prop()
+    min: Date;
+
+    @Prop()
+    max: Date;
+
     //######## END Props ########
 
-    pDay: number;
+    pDate: Date;
 
-
-    get weeksInMonth(): number {
+    //################ BEGIN Computed properties #################
+    weeksInMonth(): number {
         let month_end = this.getFirstSunday().add(35, 'days').month();
 
-        if (this.getDate().getMonth() == month_end) {
-            return 6;
-        }
-        return 5;
+        return (this.pDate.getMonth() == month_end) ? 6 : 5;
     }
 
-    get weekdaysShort(): Array<string> {
+    weekdaysShort(): Array<string> {
         return moment.weekdaysShort();
     }
+    //################ END Computed properties #################
+
+
+    @Watch('date')
+    onDateChange() {          
+        this.pDate = new Date(this.date.getTime());
+        this.$forceUpdate();
+    }
+
 
     dayClass(week: number, day: number): string {
 
         let result = "thisMonth ";
 
-        let d = moment(this.getDate());
+        let d = moment(this.pDate);
 
         let diff = d.diff(this.getFirstSunday(), 'days');
 
@@ -75,17 +83,10 @@ export default class DaysTable extends Vue {
         return (week - 1) * 7 + (weekday - 1);
     }
 
-    // ATTENTION: This must NOT be a property!!!
-    getDate(): Date {
-        return new Date(this.year, this.month, this.pDay);
-    }
-
-
-
-    // ATTENTION: Defining firstDayOfMont() and getFirstSunday() as get properties won't work. 
+    // ATTENTION: Defining firstDayOfMont() and getFirstSunday() as computed properties won't work. 
     // Dates will be wrong, likely due to some unwanted in-place object modification.
     getFirstDayOfMonth(): any {
-        return moment({ y: this.getDate().getFullYear(), M: this.getDate().getMonth(), d: 0 });
+        return moment({ y: this.pDate.getFullYear(), M: this.pDate.getMonth(), d: 0 });
     }
 
     getFirstSunday() {
@@ -96,35 +97,43 @@ export default class DaysTable extends Vue {
         return this.getFirstSunday().add(monthDay, 'days').date();
     }
 
-
     created() {
 
-        // NOTE: We must do this on create(), not on mounted()
-        if (this.day) {
-            this.pDay = this.day;
-        }
+        // NOTE: We must do this on create(), not on mounted()!        
+        // Copy "working date" from prop:
+        this.pDate = new Date(this.date.getTime());
     }
-
 
     isMyMonth(week: number, day: number) {
 
         let date = this.getFirstSunday().add(this.dayFunc(week, day), 'days').toDate();
-        return date.getMonth() == this.getDate().getMonth();
+
+        if ((this.min instanceof Date &&  date < this.min) || (this.max instanceof Date && date > this.max)) {
+            return false;
+        }
+
+        if (date.getMonth() != this.pDate.getMonth()) {
+            return false;
+        }
+
+        return true;
     }
 
     onDayClick(day: number) {
 
         let d = this.getFirstSunday().add(day, 'days');
-        this.pDay = - (this.getFirstDayOfMonth().diff(d, 'days')) + 1;
+        let monthDay = - (this.getFirstDayOfMonth().diff(d, 'days')) + 1;
+
+        this.pDate = new Date(this.pDate.getFullYear(), this.pDate.getMonth(), monthDay);        
 
         // NOTE: $forceUpdate() is required here to update the highlighed day, since
-        // this.pDay is not watched.
+        // this.pDate is not watched.
         this.$forceUpdate();
 
         // ATTENTION: We must fire the 'change' event only on manual clicking, 
         // not when the date is set from outside!
         // This prevents infinite event loops.
-        this.$emit('change', { day: this.pDay, date: this.getDate() });
+        this.$emit('change', { day: monthDay, date: this.pDate });
     }
 }
 </script>
@@ -140,7 +149,6 @@ div.vuety-days-table {
             text-align: right;
         }
 
-
         div.otherMonth {
             color: #ccc;
         }
@@ -151,6 +159,7 @@ div.vuety-days-table {
             background-color: #88d;
             color: #fff;
         }
+
         div.thisMonth:hover {
             cursor: pointer;
             background-color: #ccc;

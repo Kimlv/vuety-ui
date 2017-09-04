@@ -10,30 +10,28 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
 
 import * as moment from 'moment'
 
-@Component({
-    props: {
-        'month': Number
-    }
-})
+@Component({})
 export default class MonthDropdown extends Vue {
 
+    @Prop({ default: 0 })
     month: number;
+
     private pMonth: number = 0;
-
-    get value(): number {
-        return this.pMonth;
-    }
-
 
     @Watch('month')
     bla(old: Date, n: Date) {
         this.value = this.month;
     }
 
+    //################ BEGIN Computed properties #################
+    get value(): number {
+        return this.pMonth;
+    }
+
     set value(v: number) {
         if (v >= 0 && v <= 11 && v != this.pMonth) {
             this.pMonth = v;
-            this.$emit('monthChange', { month: this.pMonth });
+            this.$emit('change', { month: this.pMonth });
         }
     }
 
@@ -41,17 +39,10 @@ export default class MonthDropdown extends Vue {
 
         return moment.months();
     }
+    //################ END Computed properties #################
 
-
-
-    mounted() {
-
-        if (this.month) {
-            this.value = this.month;
-        }
+    created() {
+        this.value = this.month;
     }
-
-
 }
 </script>
-

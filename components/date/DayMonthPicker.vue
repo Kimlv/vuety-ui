@@ -1,78 +1,67 @@
 <template>
     <div class="vuety-day-month-picker">
-        <span class="field" @click="onClick">{{day}}.{{month+1}}</span>
+        <span class="field" @click="onClick">{{pDate.getDate()}}.{{pDate.getMonth()+1}}</span>
+
         <div ref="popup" class="popup">
-            <vt-month-dropdown ref="monthDropdown" :month="month" @monthChange="onMonthChange" />
-            <vt-days-table :year="year" :month="month" :day="day" @change="onDayChange" />
+            <vt-month-dropdown ref="monthDropdown" :month="pDate.getMonth()" @change="onMonthChange" />        
+            <vt-days-table :date="pDate" :max="max" :min="min" @change="onDayChange" />
         </div>
     </div>
 </template>
 
 <script lang="ts">
 
+// TODO: 2 Enable closing of popup with ESC key
+
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 import MonthDropdown from './MonthDropdown.vue'
 import DaysTable from './DaysTable.vue'
-
 
 @Component({
 
     components: {
         'vt-days-table': DaysTable,
         'vt-month-dropdown': MonthDropdown
-    },
+    }
 })
 export default class DayMonthPicker extends Vue {
 
-    @Prop()
+    //####### BEGIN Props #######
+    @Prop({default : new Date()})
     date: Date;
 
-    month: number = 0;
-    year: number = 2017;
-    day: number = 10;
+    @Prop()
+    min : Date;
 
-
-    // ATTENTION: This must NOT be a property!!!
-    getDate(): Date {
-        return new Date(this.year, this.month, this.day);
-    }
+    @Prop()
+    max : Date;
+    //####### END Props #######
+    
+    pDate : Date;
 
     created() {
-
-        let date = null;
-
-        if (this.date instanceof Date) {
-            date = this.date;
-        }
-        else {
-            date = new Date(Date.now());
-        }
-
-        this.month = date.getMonth();
-        this.year = date.getFullYear();
-        this.day = date.getDate();
+        this.pDate = new Date(this.date.getTime());
     }
 
-
     onClick() {
-
         let popup = <HTMLDivElement>this.$refs.popup;
         popup.style.display = 'block';
     }
 
     onDayChange(evt: any) {
-        this.day = evt.day;
-
+        
         let popup = <HTMLDivElement>this.$refs.popup;
         popup.style.display = 'none';
 
-        this.$emit('change', { date: this.getDate() });
+        this.pDate = new Date(this.pDate.getFullYear(), this.pDate.getMonth(), evt.day);
+        this.$forceUpdate();
+        this.$emit('change', { date: this.pDate });
     }
 
-    onMonthChange(evt: any) {
-        this.month = evt.month;
-
-        this.$emit('change', { date: this.getDate() });
+    onMonthChange(evt: any) {                
+        this.pDate = new Date(this.pDate.getFullYear(), evt.month, this.pDate.getDate());        
+        this.$forceUpdate();
+        this.$emit('change', { date: this.pDate });
     }
 }
 </script>
@@ -84,7 +73,6 @@ div.vuety-day-month-picker {
     // to set the horizontal position of the absolutely positioned popup to
     // the horizontal position of the "input field"
     display: inline-block;
-
 
     span.field {
         background-color: #fff;
