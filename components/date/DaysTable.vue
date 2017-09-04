@@ -1,7 +1,5 @@
 <template>
     <div class="vuety-days-table">
-        {{min}}<br/>
-        {{max}}
         <table>
             <tr>
                 <th v-for="weekday in weekdaysShort()">{{weekday}}</th>
