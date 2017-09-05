@@ -13,7 +13,7 @@ import ToggleGroup from './ToggleGroup.vue';
 export default class ToggleOption extends Vue {
 
     @Prop()
-    value : any;    
+    value : any;        
 
     cssClass(): string {
         
