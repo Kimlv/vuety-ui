@@ -31,8 +31,6 @@ export default class ToggleOption extends Vue {
 
         let parent = <ToggleGroup> this.$parent;
         parent.setValue(this.value);
-        
-        this.$forceUpdate();
     }
 }
 </script>
