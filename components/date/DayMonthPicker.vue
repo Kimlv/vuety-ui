@@ -1,6 +1,6 @@
 <template>
     <div class="vuety-day-month-picker">
-        <span class="field" @click="onClick">{{pDate.getDate()}}.{{pDate.getMonth()+1}}</span>
+        <span class="field" @click="onClick">{{value.getDate()}}.{{value.getMonth()+1}}</span>
 
         <div ref="popup" class="popup">
             <vt-month-dropdown v-model="month" />
@@ -19,7 +19,6 @@ import MonthDropdown from './MonthDropdown.vue'
 import DaysTable from './DaysTable.vue'
 
 @Component({
-
     components: {
         'vt-days-table': DaysTable,
         'vt-month-dropdown': MonthDropdown
@@ -27,35 +26,26 @@ import DaysTable from './DaysTable.vue'
 })
 export default class DayMonthPicker extends Vue {
 
-
     //####### BEGIN Props #######
     @Prop({ default: function() { return new Date(Date.now()); } })
     value: Date;
     //####### END Props #######
 
-    pDate: Date = new Date(Date.now());
-
-
     //################### BEGIN Computed Properties ######################
-
     get date(): Date {
-        return this.pDate;
+        return this.value;
     }
 
     set date(v: Date) {
-        this.pDate = new Date(v.getTime());
-        this.$forceUpdate();
-        this.$emit('input', this.pDate);
-
+        this.$emit('input', v);
     }
 
     get month(): number {
-        return this.pDate.getMonth();
+        return this.value.getMonth();
     }
 
     set month(v: number) {
-        this.date = new Date(this.pDate.getFullYear(), v, this.pDate.getDate());
-
+         this.$emit('input', new Date(this.value.getFullYear(), v, this.value.getDate()));
     }
     //################### END Computed Properties ######################
 
