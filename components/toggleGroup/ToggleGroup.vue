@@ -26,7 +26,7 @@ export default class ToggleGroup extends Vue {
     mounted() {
 
         if (typeof this.value != "undefined") {
-            this.pValue = this.value;
+            this.setValue(this.value);
         }
         else {
             if (this.$children.length > 0 && this.$children[0] instanceof ToggleOption) {
@@ -41,7 +41,7 @@ export default class ToggleGroup extends Vue {
         // Redraw children (required to update the individual options' active state):
         this.$forceUpdate();
 
-        this.$emit('change', { value: this.pValue });
+        this.$emit('input', this.pValue );
     }
 }
 </script>
