@@ -26,6 +26,7 @@ export default class LinearLayout extends Vue {
 div.vuety-linear-layout {
 
     display: flex;
+    
 
     &.row {
         flex-direction: row;
@@ -38,8 +39,9 @@ div.vuety-linear-layout {
     }
 
     >* {
+        aborder:4px solid #ff0;
         // 'width:100%'' is SUPER IMPORTANT here to ensure correct rendering in Firefox!!!
-        width: 100%;
+        width: 100%;        
     }
 }
 </style>
