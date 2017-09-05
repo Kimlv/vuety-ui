@@ -1,28 +1,41 @@
 <template>
-    <div class="vuety-linear-layout">
+    <div :class="'vuety-linear-layout ' + cssClass">
         <slot/>
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
+import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
-@Component({
-    props: {
-
-    }
-})
+@Component({})
 export default class LinearLayout extends Vue {
 
+    @Prop({ default: 'col' })
+    direction: string;
+
+    get cssClass(): string {
+
+        return this.direction == 'col' ? 'col' : 'row';
+        
+
+    }
 }
 </script>
 
 <style lang="scss">
 div.vuety-linear-layout {
+
     display: flex;
-    align-items: stretch;
-    height: 100%;
+
+    &.row {
+        flex-direction: row;
+        align-items: stretch;
+        height: 100%;
+    }
+
+    &.col {
+        flex-direction: column;
+    }
 
     >* {
         // 'width:100%'' is SUPER IMPORTANT here to ensure correct rendering in Firefox!!!
