@@ -26,22 +26,17 @@
                 <!-- ############################## END Print data rows ############################### -->
             </table>
         </div>
+
+
         <Scrollbar v-if="displayedContent.length > numDisplayedRows" @my-scroll="onMyScroll" ref="scrollbar" />
     </div>
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
+import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 import Scrollbar from './Scrollbar.vue'
 
-@Component({
-    props: {
-        columns: Array,
-        content: Array
-
-    },
-
+@Component({    
     components: {
         Scrollbar
     }
@@ -49,7 +44,11 @@ import Scrollbar from './Scrollbar.vue'
 export default class DataGrid extends Vue {
 
     //####### BEGIN Props ########
+
+    @Prop()
     content: Array<any>;
+
+    @Prop()
     columns: Array<any>;
     //####### END Props ########
 
@@ -91,8 +90,6 @@ export default class DataGrid extends Vue {
                 keyA = keyA.toLowerCase();
                 keyB = keyB.toLowerCase();
             }
-
-            //return ((a[key] < b[key]) ? -1 : ((a[key] > b[key]) ? 1 : 0));
 
             return ((keyA < keyB) ? -1 : ((keyA > keyB) ? 1 : 0));
 
@@ -203,7 +200,6 @@ export default class DataGrid extends Vue {
             this.selectedCol = colIndex;
         }
         else {
-            //this.editValue = this.displayedContent[this.selectedRow][this.columns[this.selectedCol].field];
             this.editMode = true;
         }
     }
@@ -300,7 +296,10 @@ export default class DataGrid extends Vue {
         if (this.displayedContent.length > this.numDisplayedRows) {
             let scrollbar = <Scrollbar>this.$refs.scrollbar;
             scrollbar.setHeight(th + 'px');
+            
         }
+
+        
         //########## END Synchronize scrollbar height with table height ############
     }
 }
@@ -317,6 +316,7 @@ div.vuety-datagrid {
     div.DataGrid-table-wrapper {
         flex: 1;
 
+        //################## BEGIN Table ###################
         table {
             border-collapse: collapse;
             width: 100%;
@@ -380,6 +380,7 @@ div.vuety-datagrid {
                 background-color: #dd4;
             }
         }
+        //################## END Table ###################
     }
 }
 </style>

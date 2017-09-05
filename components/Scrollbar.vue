@@ -5,14 +5,9 @@
 </template>
 
 <script lang="ts">
-import Vue from 'vue'
-import Component from 'vue-class-component'
+import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
-@Component({
-    props: {
-
-    }
-})
+@Component({})
 export default class Scrollbar extends Vue {
 
     get innerElem(): HTMLDivElement {
@@ -21,10 +16,6 @@ export default class Scrollbar extends Vue {
 
     get outerElem(): HTMLDivElement {
         return <HTMLDivElement>this.$refs.outer;
-    }
-
-    mounted() {
-        this.updateSize();
     }
 
     onScroll() {
@@ -37,16 +28,12 @@ export default class Scrollbar extends Vue {
 
     setHeight(h: string) {
         this.outerElem.style.height = h;
-        this.updateSize();
+        
+        this.innerElem.style.height = (this.outerElem.offsetHeight * 10) + 'px !important';
     }
 
     setScrollPos(p: number) {
         this.outerElem.scrollTop = p * (this.innerElem.offsetHeight - this.outerElem.offsetHeight);
-    }
-
-    updateSize() {
-        this.outerElem.style.width = (this.outerElem.offsetWidth - this.outerElem.clientWidth) + 'px';
-        this.innerElem.style.height = (this.outerElem.offsetHeight * 10) + 'px';
     }
 }
 </script>
@@ -58,7 +45,9 @@ div.vuety-scrollbar {
     min-height: 20px;
     div {
         // A width > 0 is required by Firefox to see the need for scrolling:
-        width: 10px; // An initial height larger than the scrollbar height seems to be
+        width: 1px !important; 
+        
+        // An initial height larger than the scrollbar height seems to be
         // required to display the scrollbar by both Firefox and Chrome:
         height: 10000px;
     }
