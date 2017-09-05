@@ -14,10 +14,7 @@ export default class LinearLayout extends Vue {
     direction: string;
 
     get cssClass(): string {
-
         return this.direction == 'col' ? 'col' : 'row';
-        
-
     }
 }
 </script>
@@ -26,7 +23,6 @@ export default class LinearLayout extends Vue {
 div.vuety-linear-layout {
 
     display: flex;
-    
 
     &.row {
         flex-direction: row;
@@ -38,8 +34,7 @@ div.vuety-linear-layout {
         flex-direction: column;
     }
 
-    >* {
-        aborder:4px solid #ff0;
+    >* {        
         // 'width:100%'' is SUPER IMPORTANT here to ensure correct rendering in Firefox!!!
         width: 100%;        
     }
