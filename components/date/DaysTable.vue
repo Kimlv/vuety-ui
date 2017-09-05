@@ -29,7 +29,7 @@ import * as moment from 'moment'
 export default class DaysTable extends Vue {
 
     //######## BEGIN Props ########
-    @Prop({default : new Date()})
+    @Prop({default : function() { return new Date(Date.now());})
     date: Date;
 
     @Prop()

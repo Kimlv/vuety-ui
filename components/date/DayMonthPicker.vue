@@ -27,7 +27,7 @@ import DaysTable from './DaysTable.vue'
 export default class DayMonthPicker extends Vue {
 
     //####### BEGIN Props #######
-    @Prop({default : new Date()})
+    @Prop({default : function() { return new Date(Date.now());} })
     date: Date;
 
     @Prop()
@@ -39,6 +39,7 @@ export default class DayMonthPicker extends Vue {
     
     pDate : Date;
 
+    
     created() {
         this.pDate = new Date(this.date.getTime());
     }
