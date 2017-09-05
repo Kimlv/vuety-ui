@@ -3,8 +3,9 @@
         <span class="field" @click="onClick">{{pDate.getDate()}}.{{pDate.getMonth()+1}}</span>
 
         <div ref="popup" class="popup">
-            <vt-month-dropdown ref="monthDropdown" :month="pDate.getMonth()" @change="onMonthChange" />        
-            <vt-days-table :date="pDate" :max="max" :min="min" @change="onDayChange" />
+            <vt-month-dropdown v-model="month" />
+            <vt-days-table v-model="date" @input="onDayInput" />
+
         </div>
     </div>
 </template>
@@ -26,22 +27,41 @@ import DaysTable from './DaysTable.vue'
 })
 export default class DayMonthPicker extends Vue {
 
+
     //####### BEGIN Props #######
-    @Prop({default : function() { return new Date(Date.now());} })
-    date: Date;
-
-    @Prop()
-    min : Date;
-
-    @Prop()
-    max : Date;
+    @Prop({ default: function() { return new Date(Date.now()); } })
+    value: Date;
     //####### END Props #######
-    
-    pDate : Date;
 
-    
+    pDate: Date = new Date(Date.now());
+
+
+    //################### BEGIN Computed Properties ######################
+
+    get date(): Date {
+        return this.pDate;
+    }
+
+    set date(v: Date) {
+        this.pDate = new Date(v.getTime());
+        this.$forceUpdate();
+        this.$emit('input', this.pDate);
+
+    }
+
+    get month(): number {
+        return this.pDate.getMonth();
+    }
+
+    set month(v: number) {
+        this.date = new Date(this.pDate.getFullYear(), v, this.pDate.getDate());
+
+    }
+    //################### END Computed Properties ######################
+
+
     created() {
-        this.pDate = new Date(this.date.getTime());
+        this.date = new Date(this.value.getTime());
     }
 
     onClick() {
@@ -49,20 +69,10 @@ export default class DayMonthPicker extends Vue {
         popup.style.display = 'block';
     }
 
-    onDayChange(evt: any) {
-        
+    onDayInput(evt: any) {
+
         let popup = <HTMLDivElement>this.$refs.popup;
         popup.style.display = 'none';
-
-        this.pDate = new Date(this.pDate.getFullYear(), this.pDate.getMonth(), evt.day);
-        this.$forceUpdate();
-        this.$emit('change', { date: this.pDate });
-    }
-
-    onMonthChange(evt: any) {                
-        this.pDate = new Date(this.pDate.getFullYear(), evt.month, this.pDate.getDate());        
-        this.$forceUpdate();
-        this.$emit('change', { date: this.pDate });
     }
 }
 </script>

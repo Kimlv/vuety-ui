@@ -1,5 +1,5 @@
 <template>
-    <select class="vuety-month-dropdown" v-model="value">
+    <select class="vuety-month-dropdown" v-model="month">
         <option v-for="(month, index) in months" v-bind:value="index">{{month}}</option>
     </select>
 </template>
@@ -14,24 +14,25 @@ import * as moment from 'moment'
 export default class MonthDropdown extends Vue {
 
     @Prop({ default: 0 })
-    month: number;
+    value: number;
 
     private pMonth: number = 0;
 
-    @Watch('month')
+   /*
+    @Watch('value')
     bla(old: Date, n: Date) {
-        this.value = this.month;
+        this.month = this.value;
     }
-
+*/
     //################ BEGIN Computed properties #################
-    get value(): number {
+    get month(): number {
         return this.pMonth;
     }
 
-    set value(v: number) {
+    set month(v: number) {
         if (v >= 0 && v <= 11 && v != this.pMonth) {
             this.pMonth = v;
-            this.$emit('change', { month: this.pMonth });
+            this.$emit('input', this.pMonth);
         }
     }
 
@@ -42,7 +43,7 @@ export default class MonthDropdown extends Vue {
     //################ END Computed properties #################
 
     created() {
-        this.value = this.month;
+        this.month = this.value;
     }
 }
 </script>
