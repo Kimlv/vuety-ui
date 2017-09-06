@@ -9,7 +9,7 @@
             <div class="panel">
                 <!--<button class="close" @click="onCloseClick">X</button> -->
 
-                {{data.title}} {{depth}}
+                {{data.title}} 
             </div>
         </template>
 
