@@ -1,5 +1,5 @@
 <template>
-    <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir + ' ' + cssNodeClass" :style="inlineStyle" @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp">
+    <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir + ' ' + cssNodeClass"  @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp">
 
         <template v-if="data.children.length > 0" v-for="child of data.children">
             <SupergridNodeView :data="child" :depth="depth + 1" />
@@ -32,7 +32,7 @@ export default class SupergridNodeView extends Vue {
     @Prop()
     depth: number;
 
-
+//:style="inlineStyle"
 
 
     get cssNodeClass(): string {
@@ -328,8 +328,8 @@ div.vuety-supergrid-node {
 
     div.mover {
         // border: 1px solid #aaa;
-        //background-color: rgba(255, 255, 0, 0.5);
-        background-color: rgba(255, 255, 255, 0.6);
+        background-color: rgba(255, 255, 0, 0.5);
+        //background-color: rgba(255, 255, 255, 0.6);
         display: none;
         position: fixed;
     }
