@@ -3,7 +3,6 @@ export class SupergridNode {
     dir: string = "row";
 
     parent: SupergridNode | null;
-
     title: string = "Untitled Panel";
     children: Array<SupergridNode> = [];
 
@@ -38,6 +37,86 @@ export class SupergridNode {
         else {
             this.children.push(node);
         }
+    }
+
+    attach(node : SupergridNode, insertMode : string) {
+
+
+
+        if (this == node) {
+            console.log("Drop on self!");
+            
+            return;
+        }
+
+
+        
+
+        //################ BEGIN Figure out new parent ###############
+        let newParent: SupergridNode | null = null;
+
+        if (this.parent == node.parent) {
+            newParent = node.parent;
+        }
+        else {
+            // If new sibling already has other siblings, we need to subdivide:
+
+            if (this.parent != null && this.parent.children.length > 1) {
+                this.addChild(this.copy());
+                newParent = this;
+
+            }
+            else {
+                newParent = this.parent;
+            }
+        }
+
+        if (newParent == null) {            
+            return;
+        }
+        //################ END Figure out new parent ###############
+
+
+        //################ BEGIN Insert node at new location ##################
+        // TODO: 2 Do this in the model!
+
+        switch (insertMode) {
+            case 'bottom':
+                newParent.addChild(node);
+                newParent.dir = "col";
+                break;
+
+            case 'top':
+                newParent.addChild(node, true);
+                newParent.dir = "col";
+                break;
+
+            case 'right':
+                newParent.addChild(node);
+                newParent.dir = "row";
+                break;
+
+            case 'left':
+                newParent.addChild(node, true);
+                newParent.dir = "row";
+                break;
+        }
+        //################ END Insert node at new location ##################
+
+/*
+        // TODO: 2 Move this to model
+        if (oldParent != null) {
+            if (oldParent.children.length == 1) {
+                oldParent.title = oldParent.children[0].title;
+                oldParent.dir = oldParent.children[0].dir;
+                oldParent.bgColor = oldParent.children[0].bgColor;
+
+
+                oldParent.children = oldParent.children[0].children;
+
+            }
+        }
+*/
     }
 
 

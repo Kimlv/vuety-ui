@@ -9,7 +9,7 @@
             <div class="panel">
                 <!--<button class="close" @click="onCloseClick">X</button> -->
 
-                {{data.title}} 
+                {{data.title}} {{depth}}
             </div>
         </template>
 
@@ -204,95 +204,19 @@ export default class SupergridNodeView extends Vue {
             return;
         }
 
-        let oldParent: SupergridNode | null = this.dragNode.data.parent;
 
         let newSibling = this.getPanel(evt.clientX, evt.clientY);
 
-        if (newSibling == null) {
-            this.dragNode = null;
-            return;
+        if (newSibling != null) {
+            let ns: SupergridNode = newSibling.data;
+
+            ns.attach(this.dragNode.data, this.insertMode);
+
+
         }
 
 
-        if (this.dragNode == newSibling) {
-            //console.log("Drop on self!");
-            this.dragNode = null;
-            return;
-        }
-
-
-        if (newSibling.data.parent == null) {
-            this.dragNode = null;
-            return;
-        }
-
-
-        //################ BEGIN Figure out new parent ###############
-        let newParent: SupergridNodeView | null = null;
-
-        if (newSibling.data.parent == this.dragNode.data.parent) {
-            newParent = <SupergridNodeView>this.dragNode.$parent;
-        }
-        else {
-            // If new sibling already has other siblings, we need to subdivide:
-
-            if (newSibling.data.parent.children.length > 1) {
-                newSibling.data.addChild(newSibling.data.copy());
-                newParent = newSibling;
-
-            }
-            else {
-                newParent = <SupergridNodeView>newSibling.$parent;
-            }
-        }
-
-        if (newParent == null) {
-            this.dragNode = null;
-            return;
-        }
-        //################ END Figure out new parent ###############
-
-
-        //################ BEGIN Insert node at new location ##################
-        // TODO: 2 Do this in the model!
-
-        switch (this.insertMode) {
-            case 'bottom':
-                newParent.data.addChild(this.dragNode.data);
-                newParent.data.dir = "col";
-                break;
-
-            case 'top':
-                newParent.data.addChild(this.dragNode.data, true);
-                newParent.data.dir = "col";
-                break;
-
-            case 'right':
-                newParent.data.addChild(this.dragNode.data);
-                newParent.data.dir = "row";
-                break;
-
-            case 'left':
-                newParent.data.addChild(this.dragNode.data, true);
-                newParent.data.dir = "row";
-                break;
-        }
-        //################ END Insert node at new location ##################
-
-/*
-        // TODO: 2 Move this to model
-        if (oldParent != null) {
-            if (oldParent.children.length == 1) {
-                oldParent.title = oldParent.children[0].title;
-                oldParent.dir = oldParent.children[0].dir;
-                oldParent.bgColor = oldParent.children[0].bgColor;
-
-
-                oldParent.children = oldParent.children[0].children;
-
-            }
-        }
-*/
+        this.dragNode = null;
         this.resetStyle();
     }
 
@@ -345,7 +269,7 @@ export default class SupergridNodeView extends Vue {
 div.vuety-supergrid-node {
 
 
-  //  background-color: #fff !important;
+    //  background-color: #fff !important;
     align-items: stretch;
     display: flex; // border: 1px solid #000;
     flex-grow: 1;
@@ -353,14 +277,19 @@ div.vuety-supergrid-node {
     width: 100%;
     height: 100%;
 
- -webkit-touch-callout: none; /* iOS Safari */
-    -webkit-user-select: none; /* Safari */
-     -khtml-user-select: none; /* Konqueror HTML */
-       -moz-user-select: none; /* Firefox */
-        -ms-user-select: none; /* Internet Explorer/Edge */
-            user-select: none; /* Non-prefixed version, currently
+    -webkit-touch-callout: none;
+    /* iOS Safari */
+    -webkit-user-select: none;
+    /* Safari */
+    -khtml-user-select: none;
+    /* Konqueror HTML */
+    -moz-user-select: none;
+    /* Firefox */
+    -ms-user-select: none;
+    /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently
                                   supported by Chrome and Opera */
-
     >div.panel {
         >button.close {
             background-color: none;
