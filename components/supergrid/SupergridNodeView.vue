@@ -7,6 +7,8 @@
         </template>
         <template v-if="data.children.length == 0">
             <div class="panel">
+                <!--<button class="close" @click="onCloseClick">X</button> -->
+
                 {{data.title}} {{depth}}
             </div>
         </template>
@@ -101,8 +103,17 @@ export default class SupergridNodeView extends Vue {
 
 
 
+    onCloseClick(evt: Event) {
+        console.log("close");
+
+        let parent: SupergridNode = <SupergridNode>this.data.parent;
+        parent.removeChild(this.data);
+
+
+    }
+
     onMouseDown(evt: MouseEvent) {
-        evt.stopPropagation();
+        //  evt.stopPropagation();
 
         let root = this.getRoot();
 
@@ -126,13 +137,17 @@ export default class SupergridNodeView extends Vue {
 
             if (panel != null && panel != this.dragNode) {
                 let div = panel.rootDiv;
-                div.style.border = "4px dashed #88f";
+                //div.style.border = "4px dashed #88f";
+                div.style.border = "4px dashed #fff";
 
 
-                let bla = 32;
+                let blax = div.offsetWidth * 0.3;
+                let blay = div.offsetHeight * 0.3;
+
+                this.insertMode = '';
 
                 // TODO: 2 Take offset of root Node into account!!
-                if (evt.clientX < div.offsetLeft + bla) {
+                if (evt.clientX < div.offsetLeft + blax) {
 
                     this.mover.style.left = div.offsetLeft + 'px';
                     this.mover.style.top = div.offsetTop + 'px';
@@ -142,7 +157,7 @@ export default class SupergridNodeView extends Vue {
                     this.insertMode = "left";
                 }
 
-                else if (evt.clientX > div.offsetLeft + div.offsetWidth - bla) {
+                else if (evt.clientX > div.offsetLeft + div.offsetWidth - blax) {
 
                     this.mover.style.left = (div.offsetLeft + div.offsetWidth / 2) + 'px';
                     this.mover.style.top = div.offsetTop + 'px';
@@ -153,7 +168,7 @@ export default class SupergridNodeView extends Vue {
                 }
 
 
-                else if (evt.clientY < div.offsetTop + bla) {
+                else if (evt.clientY < div.offsetTop + blay) {
                     this.mover.style.left = (div.offsetLeft) + 'px';
                     this.mover.style.top = div.offsetTop + 'px';
                     this.mover.style.width = div.offsetWidth + 'px';
@@ -162,13 +177,20 @@ export default class SupergridNodeView extends Vue {
                     this.insertMode = "top";
                 }
 
-                else if (evt.clientY > div.offsetTop + div.offsetHeight - bla) {
+                else if (evt.clientY > div.offsetTop + div.offsetHeight - blay) {
                     this.mover.style.left = (div.offsetLeft) + 'px';
                     this.mover.style.top = div.offsetTop + div.offsetHeight / 2 + 'px';
                     this.mover.style.width = div.offsetWidth + 'px';
                     this.mover.style.height = div.offsetHeight / 2 + 'px';
 
                     this.insertMode = "bottom";
+                }
+
+                else {
+                    if (this.dragNode != null) {
+                        this.mover.style.width = this.dragNode.rootDiv.offsetWidth + 'px';
+                        this.mover.style.height = this.dragNode.rootDiv.offsetHeight + 'px';
+                    }
                 }
             }
         }
@@ -257,17 +279,10 @@ export default class SupergridNodeView extends Vue {
         }
         //################ END Insert node at new location ##################
 
+/*
         // TODO: 2 Move this to model
         if (oldParent != null) {
             if (oldParent.children.length == 1) {
-                /*
-                                let index = oldParent.parent.children.indexOf(oldParent);
-                
-                                oldParent.parent.children[index] = oldParent.children[0];
-                                oldParent.parent.children[index].parent = oldParent.parent;
-                  */
-
-
                 oldParent.title = oldParent.children[0].title;
                 oldParent.dir = oldParent.children[0].dir;
                 oldParent.bgColor = oldParent.children[0].bgColor;
@@ -277,7 +292,7 @@ export default class SupergridNodeView extends Vue {
 
             }
         }
-
+*/
         this.resetStyle();
     }
 
@@ -330,7 +345,7 @@ export default class SupergridNodeView extends Vue {
 div.vuety-supergrid-node {
 
 
-    background-color: #fff !important;
+  //  background-color: #fff !important;
     align-items: stretch;
     display: flex; // border: 1px solid #000;
     flex-grow: 1;
@@ -338,10 +353,32 @@ div.vuety-supergrid-node {
     width: 100%;
     height: 100%;
 
+ -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+     -khtml-user-select: none; /* Konqueror HTML */
+       -moz-user-select: none; /* Firefox */
+        -ms-user-select: none; /* Internet Explorer/Edge */
+            user-select: none; /* Non-prefixed version, currently
+                                  supported by Chrome and Opera */
+
     >div.panel {
+        >button.close {
+            background-color: none;
+            border: none;
+            z-index: 9999;
+
+            padding: 8px;
+
+            &:hover {
+                background-color: #aaa;
+            }
+        }
+
+
+
         border: 1px solid #000;
         padding: 8px;
-        font-size: 1.2em;
+        font-size: 1.5em;
         width:100%;
         height:100%;
     }
@@ -362,7 +399,8 @@ div.vuety-supergrid-node {
 
     div.mover {
         // border: 1px solid #aaa;
-        background-color: rgba(255, 255, 0, 0.5);
+        //background-color: rgba(255, 255, 0, 0.5);
+        background-color: rgba(255, 255, 255, 0.6);
         display: none;
         position: fixed;
     }
