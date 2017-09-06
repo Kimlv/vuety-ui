@@ -1,5 +1,5 @@
 <template>
-    <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir + ' ' + cssNodeClass"  @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp">
+    <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir + ' ' + cssNodeClass" @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp">
 
         <template v-if="data.children.length > 0" v-for="child of data.children">
             <SupergridNodeView :data="child" :depth="depth + 1" />
@@ -32,7 +32,7 @@ export default class SupergridNodeView extends Vue {
     @Prop()
     depth: number;
 
-//:style="inlineStyle"
+    //:style="inlineStyle"
 
 
     get cssNodeClass(): string {
@@ -113,7 +113,7 @@ export default class SupergridNodeView extends Vue {
     }
 
     onMouseDown(evt: MouseEvent) {
-        //  evt.stopPropagation();
+        evt.stopPropagation();
 
         let root = this.getRoot();
 
@@ -133,12 +133,21 @@ export default class SupergridNodeView extends Vue {
 
             this.resetStyle();
 
+            if (this.dragNode == null) {
+                return;
+            }
+
+
+            this.mover.style.width = this.dragNode.rootDiv.offsetWidth + 'px';
+            this.mover.style.height = this.dragNode.rootDiv.offsetHeight + 'px';
+
+
             let panel = this.getPanel(evt.clientX, evt.clientY);
 
             if (panel != null && panel != this.dragNode) {
                 let div = panel.rootDiv;
-                //div.style.border = "4px dashed #88f";
-                div.style.border = "4px dashed #fff";
+                div.style.border = "4px dashed #88f";
+                //div.style.border = "4px dashed #fff";
 
 
                 let blax = div.offsetWidth * 0.3;
@@ -186,12 +195,7 @@ export default class SupergridNodeView extends Vue {
                     this.insertMode = "bottom";
                 }
 
-                else {
-                    if (this.dragNode != null) {
-                        this.mover.style.width = this.dragNode.rootDiv.offsetWidth + 'px';
-                        this.mover.style.height = this.dragNode.rootDiv.offsetHeight + 'px';
-                    }
-                }
+
             }
         }
     }
@@ -328,8 +332,7 @@ div.vuety-supergrid-node {
 
     div.mover {
         // border: 1px solid #aaa;
-        background-color: rgba(255, 255, 0, 0.5);
-        //background-color: rgba(255, 255, 255, 0.6);
+        background-color: rgba(255, 255, 0, 0.5); //background-color: rgba(255, 255, 255, 0.6);
         display: none;
         position: fixed;
     }
