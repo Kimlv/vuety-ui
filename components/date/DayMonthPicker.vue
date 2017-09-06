@@ -81,7 +81,12 @@ div.vuety-day-month-picker {
         padding: 2px;
     }
     div.popup {
-        position: absolute;
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        
+        transform: translate(-50%, -50%);
+
 
         display: none;
         background-color: #fff;
