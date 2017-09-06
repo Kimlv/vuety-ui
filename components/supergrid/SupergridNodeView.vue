@@ -1,13 +1,16 @@
 <template>
-    <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir" @click="onClick" @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp">
+    <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir + ' ' + cssNodeClass" :style="inlineStyle" @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp">
 
         <template v-if="data.children.length > 0" v-for="child of data.children">
             <SupergridNodeView :data="child" :depth="depth + 1" />
 
         </template>
         <template v-if="data.children.length == 0">
-            {{data.title}} {{depth}}
+            <div class="panel">
+                {{data.title}} {{depth}}
+            </div>
         </template>
+
         <div class="mover" ref="mover"></div>
     </div>
 </template>
@@ -27,6 +30,20 @@ export default class SupergridNodeView extends Vue {
     @Prop()
     depth: number;
 
+
+
+
+    get cssNodeClass(): string {
+
+        if (this.drag) return "on-drag";
+        return "";
+    }
+
+
+    get inlineStyle(): string {
+        return "background-color: " + this.data.bgColor;
+    }
+
     dragNode: SupergridNodeView | null;
 
     drag: boolean = false;
@@ -43,6 +60,8 @@ export default class SupergridNodeView extends Vue {
     get rootDiv(): HTMLDivElement {
         return <HTMLDivElement>this.$refs.rootDiv;
     }
+
+
 
 
 
@@ -80,20 +99,6 @@ export default class SupergridNodeView extends Vue {
         return result;
     }
 
-    onClick(evt: MouseEvent) {
-        evt.stopPropagation();
-
-        /*
-                console.log("la");
-        
-                var index = this.data.parent.children.indexOf(this.data);
-        
-        
-                if (index > -1) {
-                    this.data.parent.children.splice(index, 1);
-                }
-        */
-    }
 
 
     onMouseDown(evt: MouseEvent) {
@@ -119,7 +124,7 @@ export default class SupergridNodeView extends Vue {
 
             let panel = this.getPanel(evt.clientX, evt.clientY);
 
-            if (panel != null) {
+            if (panel != null && panel != this.dragNode) {
                 let div = panel.rootDiv;
                 div.style.border = "4px dashed #88f";
 
@@ -128,7 +133,6 @@ export default class SupergridNodeView extends Vue {
 
                 // TODO: 2 Take offset of root Node into account!!
                 if (evt.clientX < div.offsetLeft + bla) {
-                    //div.style.backgroundColor = '#ccc';
 
                     this.mover.style.left = div.offsetLeft + 'px';
                     this.mover.style.top = div.offsetTop + 'px';
@@ -139,7 +143,6 @@ export default class SupergridNodeView extends Vue {
                 }
 
                 else if (evt.clientX > div.offsetLeft + div.offsetWidth - bla) {
-                    //div.style.backgroundColor = '#ccc';
 
                     this.mover.style.left = (div.offsetLeft + div.offsetWidth / 2) + 'px';
                     this.mover.style.top = div.offsetTop + 'px';
@@ -167,9 +170,7 @@ export default class SupergridNodeView extends Vue {
 
                     this.insertMode = "bottom";
                 }
-
             }
-
         }
     }
 
@@ -177,57 +178,107 @@ export default class SupergridNodeView extends Vue {
         this.drag = false;
         this.mover.style.display = 'none';
 
-        if (this.dragNode != null) {
+        if (this.dragNode == null) {
+            return;
+        }
 
-            let newSibling = this.getPanel(evt.clientX, evt.clientY);
+        let oldParent: SupergridNode | null = this.dragNode.data.parent;
 
-            if (newSibling != null) {
+        let newSibling = this.getPanel(evt.clientX, evt.clientY);
 
-                let oldParent = this.dragNode.data.parent;
-                let newParent = <SupergridNodeView | null>newSibling.$parent;
-
-                
-
-                if (oldParent != newParent) {
-                    if (oldParent != null && newParent != null) {
-                        oldParent.removeChild(this.dragNode.data);
-
-
-
-
-
-                        switch (this.insertMode) {
-                            case 'bottom':
-                                newParent.data.addChild(this.dragNode.data);
-                                newParent.data.dir = "col";
-                                break;
-
-                            case 'top':
-                                newParent.data.addChild(this.dragNode.data, true);
-                                newParent.data.dir = "col";
-                                break;
-
-                            case 'right':
-                                newParent.data.addChild(this.dragNode.data);
-                                newParent.data.dir = "row";
-                                break;
-
-                            case 'left':
-                                newParent.data.addChild(this.dragNode.data, true);
-                                newParent.data.dir = "row";
-                                break;
-                        }
-
-                    }
-                }
-            }
-
+        if (newSibling == null) {
             this.dragNode = null;
-            this.resetStyle();
+            return;
         }
 
 
+        if (this.dragNode == newSibling) {
+            //console.log("Drop on self!");
+            this.dragNode = null;
+            return;
+        }
 
+
+        if (newSibling.data.parent == null) {
+            this.dragNode = null;
+            return;
+        }
+
+
+        //################ BEGIN Figure out new parent ###############
+        let newParent: SupergridNodeView | null = null;
+
+        if (newSibling.data.parent == this.dragNode.data.parent) {
+            newParent = <SupergridNodeView>this.dragNode.$parent;
+        }
+        else {
+            // If new sibling already has other siblings, we need to subdivide:
+
+            if (newSibling.data.parent.children.length > 1) {
+                newSibling.data.addChild(newSibling.data.copy());
+                newParent = newSibling;
+
+            }
+            else {
+                newParent = <SupergridNodeView>newSibling.$parent;
+            }
+        }
+
+        if (newParent == null) {
+            this.dragNode = null;
+            return;
+        }
+        //################ END Figure out new parent ###############
+
+
+        //################ BEGIN Insert node at new location ##################
+        // TODO: 2 Do this in the model!
+
+        switch (this.insertMode) {
+            case 'bottom':
+                newParent.data.addChild(this.dragNode.data);
+                newParent.data.dir = "col";
+                break;
+
+            case 'top':
+                newParent.data.addChild(this.dragNode.data, true);
+                newParent.data.dir = "col";
+                break;
+
+            case 'right':
+                newParent.data.addChild(this.dragNode.data);
+                newParent.data.dir = "row";
+                break;
+
+            case 'left':
+                newParent.data.addChild(this.dragNode.data, true);
+                newParent.data.dir = "row";
+                break;
+        }
+        //################ END Insert node at new location ##################
+
+        // TODO: 2 Move this to model
+        if (oldParent != null) {
+            if (oldParent.children.length == 1) {
+                /*
+                                let index = oldParent.parent.children.indexOf(oldParent);
+                
+                                oldParent.parent.children[index] = oldParent.children[0];
+                                oldParent.parent.children[index].parent = oldParent.parent;
+                  */
+
+
+                oldParent.title = oldParent.children[0].title;
+                oldParent.dir = oldParent.children[0].dir;
+                oldParent.bgColor = oldParent.children[0].bgColor;
+
+
+                oldParent.children = oldParent.children[0].children;
+
+            }
+        }
+
+        this.resetStyle();
     }
 
 
@@ -238,7 +289,8 @@ export default class SupergridNodeView extends Vue {
             let ac = <any>child;
 
             if (ac instanceof SupergridNodeView) {
-                ac.rootDiv.style.border = '1px solid #000';
+                // TODO: 2 Don't hard-code this
+                ac.rootDiv.style.border = 'none';
                 ac.resetStyle();
             }
         }
@@ -276,14 +328,27 @@ export default class SupergridNodeView extends Vue {
 
 <style lang="scss">
 div.vuety-supergrid-node {
-    background-color: #fff;
+
+
+    background-color: #fff !important;
     align-items: stretch;
-    display: flex;
-    border: 1px solid #000;
+    display: flex; // border: 1px solid #000;
     flex-grow: 1;
 
     width: 100%;
     height: 100%;
+
+    >div.panel {
+        border: 1px solid #000;
+        padding: 8px;
+        font-size: 1.2em;
+        width:100%;
+        height:100%;
+    }
+
+    &.leaf {
+        // background-color:#aaf;
+    }
 
     &.col {
         flex-direction: column;
@@ -292,6 +357,8 @@ div.vuety-supergrid-node {
     &.row {
         flex-direction: row;
     }
+
+
 
     div.mover {
         // border: 1px solid #aaa;

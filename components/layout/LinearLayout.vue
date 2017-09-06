@@ -36,7 +36,8 @@ div.vuety-linear-layout {
 
     >* {        
         // 'width:100%'' is SUPER IMPORTANT here to ensure correct rendering in Firefox!!!
-        width: 100%;        
+        width: 100%;  
+        
     }
 }
 </style>
