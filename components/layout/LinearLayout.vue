@@ -23,8 +23,10 @@ export default class LinearLayout extends Vue {
 div.vuety-linear-layout {
 
     display: flex;
+    
 
     &.row {
+
         flex-direction: row;
         align-items: stretch;
         height: 100%;
@@ -32,10 +34,12 @@ div.vuety-linear-layout {
 
     &.col {
         flex-direction: column;
+        justify-content: space-evenly;
     }
 
     >* {        
         // 'width:100%'' is SUPER IMPORTANT here to ensure correct rendering in Firefox!!!
+        
         width: 100%;  
         
     }
