@@ -1,13 +1,15 @@
+import { SupergridPanel } from './SupergridPanel'
+
 export class SupergridNode {
 
     dir: string = "row";
+    divider : number = 0.5;
+
 
     parent: SupergridNode | null;
-    title: string = "Untitled Panel";
-    children: Array<SupergridNode> = [];
 
-    image: string;
-    bgColor: string;
+
+    children: Array<SupergridNode | SupergridPanel> = [];
 
 
     get root(): SupergridNode {
@@ -21,146 +23,55 @@ export class SupergridNode {
         return result;
     }
 
+    addChild(child: SupergridNode | SupergridPanel, front: boolean = false) {
 
-    constructor(title: string, bgcolor: string) {
-        this.title = title;
-        this.bgColor = bgcolor;
+        if (child.parent != null) {
+            child.parent.removeChild(child);
+        }
+
+        if (front) {
+            this.children.unshift(child);
+        }
+        else {
+            this.children.push(child);
+        }
+
+        child.parent = this;
     }
 
 
     cleanup() {
-      
-        if (this.parent != null) {
-            if (this.children.length == 1) {
+        if (this.children.length == 1 && this.children[0] instanceof SupergridNode) {
 
-                let index = this.parent.children.indexOf(this);
-                this.children[0].parent = this.parent;
-                this.parent.children[index] = this.children[0];
-              
-            }
+            let child = <SupergridNode>this.children[0];
+
+            this.children = child.children;
+            this.dir = child.dir;
         }
 
         for (let child of this.children) {
-            child.cleanup();
-        }
-    }
 
+            child.parent = this;
 
-
-    addChild(node: SupergridNode, front: boolean = false) {
-
-        // NOTE: We must not check here if 'this' already has 'node' as a child,
-        // since event if it has, the order might be changed.
-
-        // Remove node from old parent:
-        if (node.parent != null) {
-            node.parent.removeChild(node);
-        }
-
-        // Set new parent:
-        node.parent = this;
-
-        if (front) {
-            this.children.unshift(node);
-        }
-        else {
-            this.children.push(node);
-        }
-    }
-
-
-    attach(node: SupergridNode, insertMode: string) {
-
-        if (this == node) {
-            console.log("Drop on self!");
-            return;
-        }
-
-        let oldParent = node.parent;
-
-        //################ BEGIN Figure out new parent ###############
-        let newParent: SupergridNode | null = this.parent;
-
-        if (this.parent != node.parent) {
-
-            // If new sibling already has other siblings, we need to subdivide:
-            if (this.parent != null && this.parent.children.length > 1) {
-                this.addChild(this.copy());
-                newParent = this;
+            if (child instanceof SupergridNode) {
+                child.cleanup();
             }
         }
-
-        if (newParent == null) {
-            return;
-        }
-        //################ END Figure out new parent ###############
-
-
-        //################ BEGIN Insert node at new location ##################
-
-        switch (insertMode) {
-            case 'bottom':
-                newParent.addChild(node);
-                newParent.dir = "col";
-                break;
-
-            case 'top':
-                newParent.addChild(node, true);
-                newParent.dir = "col";
-                break;
-
-            case 'right':
-                newParent.addChild(node);
-                newParent.dir = "row";
-                break;
-
-            case 'left':
-                newParent.addChild(node, true);
-                newParent.dir = "row";
-                break;
-        }
-        //################ END Insert node at new location ##################
-
-        this.root.cleanup();
     }
 
-
-    copy(): SupergridNode {
-
-        let result = new SupergridNode(this.title, this.bgColor);
-        return result;
-    }
-
-
-
-
-    hasChild(node: SupergridNode): boolean {
-        var index = this.children.indexOf(node);
-
-        return index > -1;
-    }
-
-    removeChild(node: SupergridNode) {
-        var index = this.children.indexOf(node);
+    removeChild(child: SupergridNode | SupergridPanel) {
+        let index = this.children.indexOf(child);
 
         if (index > -1) {
             this.children.splice(index, 1);
-            node.parent = null;
         }
 
+        child.parent = null;
 
-        //########## BEGIN Remove empty node ##########        
-        if (this.children.length == 0) {
-
-            if (this.parent != null) {
-                this.parent.removeChild(this);
-                this.parent = null;
-            }
+        if (this.children.length == 0 && this.parent != null) {
+            this.parent.removeChild(this);
         }
-        //########## END Remove empty node ##########
 
-
+      //  this.root.cleanup();
     }
-
-
 }

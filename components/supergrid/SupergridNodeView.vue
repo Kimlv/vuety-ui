@@ -1,270 +1,147 @@
 <template>
-    <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir + ' ' + cssNodeClass" @mousedown="onMouseDown" @mousemove="onMouseMove" @mouseup="onMouseUp">
-
-        <template v-if="data.children.length > 0" v-for="child of data.children">
-            <SupergridNodeView :data="child" :depth="depth + 1" />
-
+    <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir">
+        <template v-for="(child, index) of data.children">
+            <compontent :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />
         </template>
-        <template v-if="data.children.length == 0">
-            <div class="panel">
-                <!--<button class="close" @click="onCloseClick">X</button> -->
-
-                {{data.title}} {{depth}}
-            </div>
-        </template>
-
-        <div class="mover" ref="mover"></div>
     </div>
 </template>
 
-<script lang="ts">
+<script lang="ts" id="supergrid-node-view">
 
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
+
 import { SupergridNode } from './SupergridNode'
+import { SupergridPanel } from './SupergridPanel'
 
-@Component({})
+import SupergridRootView from './SupergridRootView.vue'
+import SupergridPanelView from './SupergridPanelView.vue'
+
+@Component({
+
+    components: {
+
+        'supergrid-panel-view': SupergridPanelView
+    },
+
+    name: 'supergrid-node-view'
+})
 export default class SupergridNodeView extends Vue {
-
 
     @Prop()
     data: SupergridNode;
 
-    @Prop()
-    depth: number;
+    get root(): SupergridRootView {
+        let result: SupergridNodeView = this;
 
-    //:style="inlineStyle"
+        while (result.$parent instanceof SupergridNodeView) {
+            result = <SupergridNodeView>result.$parent;
+        }
 
-
-    get cssNodeClass(): string {
-
-        if (this.drag) return "on-drag";
-        return "";
+        return <SupergridRootView>result.$parent;
     }
 
-
-    get inlineStyle(): string {
-        return "background-color: " + this.data.bgColor;
-    }
-
-    dragNode: SupergridNodeView | null;
-
-    drag: boolean = false;
-
-    insertMode: string = "top";
-
-    dragOffsetX: number = 0;
-    dragOffsetY: number = 0;
-
-    get mover(): HTMLDivElement {
-        return <HTMLDivElement>this.$refs.mover;
-    }
 
     get rootDiv(): HTMLDivElement {
         return <HTMLDivElement>this.$refs.rootDiv;
     }
 
 
+    getComponentClass(child: any): string {
+
+        if (child instanceof SupergridNode) {
+            return "supergrid-node-view";
+        }
+
+        if (child instanceof SupergridPanel) {
+            return "supergrid-panel-view";
+        }
+
+        return "";
+    }
+
+    getPanelUnder(x: number, y: number): SupergridNodeView | SupergridPanelView | null {
+
+        //#################### BEGIN Update active resize node #######################
+        // Horizontal:
+        let foo = (x - (this.rootDiv.offsetLeft + this.rootDiv.offsetWidth * this.data.divider));
+
+        if (Math.abs(foo) < 5 && this.data.dir == "row") {
+            this.root.resizeNode = this;
+            this.root.rootDiv.style.cursor = "ew-resize";
+        }
+
+        // Vertical:
+        let foo2 = (y - (this.rootDiv.offsetTop + this.rootDiv.offsetHeight * this.data.divider));
+
+        if (Math.abs(foo2) < 5 && this.data.dir == "col") {
+            this.root.resizeNode = this;
+            this.root.rootDiv.style.cursor = "ns-resize";
+        }
+        //#################### END Update active resize node #######################
+
+        //######################## BEGIN Allow attach to outer borders on root level ###################
+        let myDiv = this.rootDiv;
+        let border = 20;
+
+        if ((x > myDiv.offsetLeft && x < myDiv.offsetLeft + border) ||
+            (x > myDiv.offsetLeft + myDiv.offsetWidth - border && x < myDiv.offsetLeft + myDiv.offsetWidth)
+
+            ||
+
+            (y > myDiv.offsetTop && y < myDiv.offsetTop + border) ||
+            (y > myDiv.offsetTop + myDiv.offsetHeight - border && y < myDiv.offsetTop + myDiv.offsetHeight)
+
+        ) {
+            return this;
+        }
+        //######################## END Allow attach to outer borders on root level ###################
 
 
 
-    getPanel(x: number, y: number): SupergridNodeView | null {
-
+        //################### BEGIN Recursive search for panel under mouse ###################
         for (let child of this.$children) {
 
-            let ac = <any>child;
-            if (ac instanceof SupergridNodeView) {
-                let div = ac.rootDiv;
+            let ac = <SupergridNodeView | SupergridPanelView>child;
 
-                if (x > div.offsetLeft && x < div.offsetLeft + div.offsetWidth &&
-                    y > div.offsetTop && y < div.offsetTop + div.offsetHeight) {
+            let div = ac.rootDiv;
 
-                    if (ac.$children.length > 0) {
-                        return ac.getPanel(x, y);
+            // ATTENTION: This only works because the x/y coordinates that are initially passed to the
+            // first recursion step of getPanelUnder() are already relative to the DIV that is eventually
+            // found (i.e. the one that is under the mouse!)
+            if (x > div.offsetLeft && x < div.offsetLeft + div.offsetWidth &&
+                y > div.offsetTop && y < div.offsetTop + div.offsetHeight) {
+
+                if (ac instanceof SupergridNodeView) {
+
+                    let bla = ac.getPanelUnder(x, y);
+
+                    if (bla != null) {
+                        return bla;
                     }
-                    else {
-                        return ac;
-                    }
+                }
+                else if (ac instanceof SupergridPanelView) {
+                    return ac;
                 }
             }
         }
+        //################### END Recursive search for panel under mouse ###################
 
         return null;
     }
 
-    getRoot(): SupergridNodeView {
-        let result = <SupergridNodeView>this;
 
-        while (result.$parent instanceof SupergridNodeView) {
-            result = <SupergridNodeView>result.$parent;
+    inlineStyle(index: number) {
+
+        let size = (index == 0) ? this.data.divider * 100 : (1 - this.data.divider) * 100;
+
+        if (this.data.children.length == 1) {
+            size = 100;
         }
 
-        return result;
-    }
+        let dir1 = this.data.dir == "col" ? "height" : "width";
+        let dir2 = this.data.dir == "col" ? "width" : "height";
 
-
-
-    onCloseClick(evt: Event) {
-        console.log("close");
-
-        let parent: SupergridNode = <SupergridNode>this.data.parent;
-        parent.removeChild(this.data);
-
-
-    }
-
-    onMouseDown(evt: MouseEvent) {
-        evt.stopPropagation();
-
-        let root = this.getRoot();
-
-
-        root.showMover(this, evt);
-    }
-
-
-    onMouseMove(evt: MouseEvent) {
-
-        //console.log(evt.offsetX + " " + evt.offsetY);
-
-        if (this.drag) {
-
-            this.mover.style.left = (evt.clientX - this.dragOffsetX) + 'px';
-            this.mover.style.top = (evt.clientY - this.dragOffsetY) + 'px';
-
-            this.resetStyle();
-
-            if (this.dragNode == null) {
-                return;
-            }
-
-
-            this.mover.style.width = this.dragNode.rootDiv.offsetWidth + 'px';
-            this.mover.style.height = this.dragNode.rootDiv.offsetHeight + 'px';
-
-
-            let panel = this.getPanel(evt.clientX, evt.clientY);
-
-            if (panel != null && panel != this.dragNode) {
-                let div = panel.rootDiv;
-                div.style.border = "4px dashed #88f";
-                //div.style.border = "4px dashed #fff";
-
-
-                let blax = div.offsetWidth * 0.3;
-                let blay = div.offsetHeight * 0.3;
-
-                this.insertMode = '';
-
-                // TODO: 2 Take offset of root Node into account!!
-                if (evt.clientX < div.offsetLeft + blax) {
-
-                    this.mover.style.left = div.offsetLeft + 'px';
-                    this.mover.style.top = div.offsetTop + 'px';
-                    this.mover.style.width = div.offsetWidth / 2 + 'px';
-                    this.mover.style.height = div.offsetHeight + 'px';
-
-                    this.insertMode = "left";
-                }
-
-                else if (evt.clientX > div.offsetLeft + div.offsetWidth - blax) {
-
-                    this.mover.style.left = (div.offsetLeft + div.offsetWidth / 2) + 'px';
-                    this.mover.style.top = div.offsetTop + 'px';
-                    this.mover.style.width = div.offsetWidth / 2 + 'px';
-                    this.mover.style.height = div.offsetHeight + 'px';
-
-                    this.insertMode = "right";
-                }
-
-
-                else if (evt.clientY < div.offsetTop + blay) {
-                    this.mover.style.left = (div.offsetLeft) + 'px';
-                    this.mover.style.top = div.offsetTop + 'px';
-                    this.mover.style.width = div.offsetWidth + 'px';
-                    this.mover.style.height = div.offsetHeight / 2 + 'px';
-
-                    this.insertMode = "top";
-                }
-
-                else if (evt.clientY > div.offsetTop + div.offsetHeight - blay) {
-                    this.mover.style.left = (div.offsetLeft) + 'px';
-                    this.mover.style.top = div.offsetTop + div.offsetHeight / 2 + 'px';
-                    this.mover.style.width = div.offsetWidth + 'px';
-                    this.mover.style.height = div.offsetHeight / 2 + 'px';
-
-                    this.insertMode = "bottom";
-                }
-
-
-            }
-        }
-    }
-
-    onMouseUp(evt: MouseEvent) {
-        this.drag = false;
-        this.mover.style.display = 'none';
-
-        if (this.dragNode == null) {
-            return;
-        }
-
-
-        let newSibling = this.getPanel(evt.clientX, evt.clientY);
-
-        if (newSibling != null) {
-            let ns: SupergridNode = newSibling.data;
-
-            ns.attach(this.dragNode.data, this.insertMode);
-
-
-        }
-
-
-        this.dragNode = null;
-        this.resetStyle();
-    }
-
-
-    resetStyle() {
-
-        for (let child of this.$children) {
-
-            let ac = <any>child;
-
-            if (ac instanceof SupergridNodeView) {
-                // TODO: 2 Don't hard-code this
-                ac.rootDiv.style.border = 'none';
-                ac.resetStyle();
-            }
-        }
-    }
-
-
-    showMover(panel: SupergridNodeView, evt: MouseEvent) {
-
-        if (this.drag) return;
-
-        this.dragNode = panel;
-
-
-
-        let mover = <HTMLDivElement>this.$refs.mover;
-
-        let div = panel.rootDiv;
-
-        mover.style.width = div.offsetWidth + 'px';
-        mover.style.height = div.offsetHeight + 'px';
-
-        mover.style.left = div.offsetLeft + 'px';
-        mover.style.top = div.offsetTop + 'px';
-
-        mover.style.display = 'block';
-
-        this.dragOffsetX = evt.clientX - div.offsetLeft;
-        this.dragOffsetY = evt.clientY - div.offsetTop;
-
-
-        this.drag = true;
+        return dir1 + ": " + size + "%;" + dir2 + ": 100%";
     }
 }
 </script>
@@ -272,53 +149,8 @@ export default class SupergridNodeView extends Vue {
 <style lang="scss">
 div.vuety-supergrid-node {
 
-
-    //  background-color: #fff !important;
     align-items: stretch;
-    display: flex; // border: 1px solid #000;
-    flex-grow: 1;
-
-    width: 100%;
-    height: 100%;
-
-    -webkit-touch-callout: none;
-    /* iOS Safari */
-    -webkit-user-select: none;
-    /* Safari */
-    -khtml-user-select: none;
-    /* Konqueror HTML */
-    -moz-user-select: none;
-    /* Firefox */
-    -ms-user-select: none;
-    /* Internet Explorer/Edge */
-    user-select: none;
-    /* Non-prefixed version, currently
-                                  supported by Chrome and Opera */
-    >div.panel {
-        >button.close {
-            background-color: none;
-            border: none;
-            z-index: 9999;
-
-            padding: 8px;
-
-            &:hover {
-                background-color: #aaa;
-            }
-        }
-
-
-
-        border: 1px solid #000;
-        padding: 8px;
-        font-size: 1.5em;
-        width:100%;
-        height:100%;
-    }
-
-    &.leaf {
-        // background-color:#aaf;
-    }
+    display: flex;
 
     &.col {
         flex-direction: column;
@@ -326,15 +158,6 @@ div.vuety-supergrid-node {
 
     &.row {
         flex-direction: row;
-    }
-
-
-
-    div.mover {
-        // border: 1px solid #aaa;
-        background-color: rgba(255, 255, 0, 0.5); //background-color: rgba(255, 255, 255, 0.6);
-        display: none;
-        position: fixed;
     }
 }
 </style>
