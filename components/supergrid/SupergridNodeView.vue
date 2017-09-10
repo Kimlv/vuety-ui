@@ -19,7 +19,6 @@ import SupergridPanelView from './SupergridPanelView.vue'
 @Component({
 
     components: {
-
         'supergrid-panel-view': SupergridPanelView
     },
 
@@ -80,6 +79,8 @@ export default class SupergridNodeView extends Vue {
         //#################### END Update active resize node #######################
 
         //######################## BEGIN Allow attach to outer borders on root level ###################
+
+        // TODO: 2 Move this to SupergridRootView
         let myDiv = this.rootDiv;
         let border = 20;
 
@@ -151,6 +152,9 @@ div.vuety-supergrid-node {
 
     align-items: stretch;
     display: flex;
+
+    // Important!:
+    flex:1;
 
     &.col {
         flex-direction: column;

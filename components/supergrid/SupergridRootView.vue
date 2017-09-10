@@ -17,22 +17,19 @@ import SupergridNodeView from './SupergridNodeView.vue'
 import SupergridPanelView from './SupergridPanelView.vue'
 
 @Component({
-
     components: {
         'supergrid-node-view': SupergridNodeView,
-        'supergrid-panel-view': SupergridPanelView
     }
 })
 export default class SupergridRootView extends Vue {
 
+    //######### BEGIN Props ##########
     @Prop()
     data: SupergridNode;
+    //######### END Props ##########
 
-   
+
     dragPanel: SupergridPanelView | null;
-
-
-
 
     insertMode: string = "top";
 
@@ -42,23 +39,24 @@ export default class SupergridRootView extends Vue {
     resize: boolean = false;
     resizeNode: SupergridNodeView | null = null;
 
+
+    //################## BEGIN Computed Properties ###################
     get mover(): HTMLDivElement {
         return <HTMLDivElement>this.$refs.mover;
     }
 
-   
-   get nodeView() : SupergridNodeView {
-       return <SupergridNodeView> this.$refs.nodeView;
-   }
+
+    get nodeView(): SupergridNodeView {
+        return <SupergridNodeView>this.$refs.nodeView;
+    }
 
     get rootDiv(): HTMLDivElement {
         return <HTMLDivElement>this.$refs.rootDiv;
     }
+    //################## END Computed Properties ###################
 
 
-   
 
-   
 
     onMouseDown(evt: MouseEvent) {
 
@@ -89,7 +87,6 @@ export default class SupergridRootView extends Vue {
 
     onMouseMove(evt: MouseEvent) {
 
-
         //########################## BEGIN Resize panels #########################
         if (this.resize && this.resizeNode != null) {
             this.dragPanel = null;
@@ -106,8 +103,6 @@ export default class SupergridRootView extends Vue {
             return;
         }
         //########################## END Resize panels #########################
-
-
 
         // NOTE: These two are set by getPanelUnder(), so they must be resetted before it is called!
         this.resizeNode = null;
@@ -142,8 +137,6 @@ export default class SupergridRootView extends Vue {
         }
 
         let div = panelUnderMouse.rootDiv;
-        //    div.style.border = "4px dashed #88f";
-
 
         let blax = div.offsetWidth * 0.3;
         let blay = div.offsetHeight * 0.3;
@@ -204,6 +197,7 @@ export default class SupergridRootView extends Vue {
             return;
         }
 
+        // TODO: 3 Don't hard-code styles here
         this.dragPanel.rootDiv.style.border = "1px solid #000";
 
         let foo = this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
@@ -221,18 +215,12 @@ export default class SupergridRootView extends Vue {
             return;
         }
 
-        if (newSibling == null) {
-            console.log("new sibling is null");
-            this.dragPanel = null;
-            return;
-        }
 
         let grandparent = newSibling.parent;
-        let newParent = new SupergridNode();
+        
 
-
+        //########### BEGIN If newSibling is the root element, add a new root to the hierarchy ###########
         if (grandparent == null) {
-            // If newSibling IS the current root element...
 
             grandparent = this.data.root;
 
@@ -249,6 +237,7 @@ export default class SupergridRootView extends Vue {
             grandparent.children = [newSibling];
             grandparent.divider = 0.5;
         }
+        //########### END If newSibling is the root element, add a new root to the hierarchy ###########
 
         let si = grandparent.children.indexOf(newSibling);
 
@@ -258,6 +247,7 @@ export default class SupergridRootView extends Vue {
             return;
         }
 
+        let newParent = new SupergridNode();
 
         let dp = (<SupergridPanelView>this.dragPanel).data;
 
@@ -307,6 +297,7 @@ div.vuety-supergrid-root {
     align-items: stretch;
     display: flex;
 
+
     &.col {
         flex-direction: column;
     }
@@ -317,7 +308,7 @@ div.vuety-supergrid-root {
 
     div.mover {
         // border: 1px solid #aaa;
-        background-color: rgba(255, 255, 0, 0.5); 
+        background-color: rgba(255, 255, 0, 0.5);
         display: none;
         position: fixed;
         cursor: move;

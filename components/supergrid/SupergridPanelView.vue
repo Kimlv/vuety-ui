@@ -32,7 +32,6 @@ export default class SupergridPanelView extends Vue {
         evt.stopImmediatePropagation();
         
         this.data.parent.removeChild(this.data);
-       
     }
 
     onMouseDown(evt: MouseEvent) {

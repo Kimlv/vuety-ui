@@ -71,7 +71,5 @@ export class SupergridNode {
         if (this.children.length == 0 && this.parent != null) {
             this.parent.removeChild(this);
         }
-
-      //  this.root.cleanup();
     }
 }
