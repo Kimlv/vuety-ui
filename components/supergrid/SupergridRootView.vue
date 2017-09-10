@@ -17,7 +17,7 @@ import SupergridPanelView from './SupergridPanelView.vue'
 
 @Component({
     components: {
-        'supergrid-node-view': SupergridNodeView,
+        'supergrid-node-view': SupergridNodeView
     }
 })
 export default class SupergridRootView extends Vue {
@@ -28,7 +28,9 @@ export default class SupergridRootView extends Vue {
     //######### END Props ##########
 
     //################# BEGIN Misc properties ###################
-    dragPanel: SupergridPanelView | null;
+
+    // NOTE: pDragPanel must be initialized!!
+    pDragPanel: SupergridPanelView | null = null;
 
     insertMode: string = "top";
 
@@ -39,7 +41,46 @@ export default class SupergridRootView extends Vue {
     resizeNode: SupergridNodeView | null = null;
     //################# END Misc properties ###################
 
+
+
+
     //################## BEGIN Computed Properties ###################
+
+    get dragPanel(): SupergridPanelView | null {
+        return this.pDragPanel;
+    }
+
+    set dragPanel(v: SupergridPanelView | null) {
+
+        if (v != null) {
+            this.resizeNode = null;
+            this.resize = false;
+
+            this.pDragPanel = v;
+            this.pDragPanel.rootDiv.classList.add('dragged');
+
+            //########## BEGIN Update mover style #############
+            let div = this.pDragPanel.rootDiv;
+
+            this.mover.style.display = 'block';
+            this.mover.style.width = div.offsetWidth + 'px';
+            this.mover.style.height = div.offsetHeight + 'px';
+            this.mover.style.left = div.offsetLeft + 'px';
+            this.mover.style.top = div.offsetTop + 'px';
+            //########## END Update mover style #############
+        }
+        else {
+            if (this.pDragPanel != null) {
+                this.pDragPanel.rootDiv.classList.remove('dragged');
+            }
+
+            this.pDragPanel = v;
+
+            this.mover.style.display = 'none';
+        }
+    }
+
+
     get mover(): HTMLDivElement {
         return <HTMLDivElement>this.$refs.mover;
     }
@@ -61,17 +102,7 @@ export default class SupergridRootView extends Vue {
 
         if (this.dragPanel != null && this.resizeNode == null) {
 
-            let mover = <HTMLDivElement>this.$refs.mover;
-
             let div = this.dragPanel.rootDiv;
-
-            mover.style.width = div.offsetWidth + 'px';
-            mover.style.height = div.offsetHeight + 'px';
-
-            mover.style.left = div.offsetLeft + 'px';
-            mover.style.top = div.offsetTop + 'px';
-
-            mover.style.display = 'block';
 
             this.dragOffsetX = evt.clientX - div.offsetLeft;
             this.dragOffsetY = evt.clientY - div.offsetTop;
@@ -85,11 +116,9 @@ export default class SupergridRootView extends Vue {
             this.dragPanel = null;
 
             if (this.resizeNode.data.dir == "row") {
-
                 this.resizeNode.data.divider = (evt.clientX - this.resizeNode.rootDiv.offsetLeft) / this.resizeNode.rootDiv.offsetWidth;
             }
             if (this.resizeNode.data.dir == "col") {
-
                 this.resizeNode.data.divider = (evt.clientY - this.resizeNode.rootDiv.offsetTop) / this.resizeNode.rootDiv.offsetHeight;
             }
 
@@ -109,12 +138,9 @@ export default class SupergridRootView extends Vue {
             return;
         }
 
-        //############### BEGIN Update drag panel style ###################
-        this.dragPanel.rootDiv.style.border = '4px solid #f00';
-        //############### END Update drag panel style ###################
-
-
         //############ BEGIN Update mover size and position ###############
+
+        // NOTE: Updating mover width and height here is REQUIRED because it is changed by "snapping".
         this.mover.style.width = this.dragPanel.rootDiv.offsetWidth + 'px';
         this.mover.style.height = this.dragPanel.rootDiv.offsetHeight + 'px';
 
@@ -181,9 +207,8 @@ export default class SupergridRootView extends Vue {
 
         this.resize = false;
 
-        this.mover.style.display = 'none';
 
-
+        //########################### BEGIN Drop drag panel #############################
         if (this.dragPanel == null) {
             return;
         }
@@ -193,8 +218,6 @@ export default class SupergridRootView extends Vue {
             return;
         }
 
-        // TODO: 3 Don't hard-code styles here
-        this.dragPanel.rootDiv.style.border = "1px solid #000";
 
         let foo = this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
 
@@ -260,9 +283,9 @@ export default class SupergridRootView extends Vue {
                 break;
 
             case 'left':
-                newParent.dir = 'row';                
+                newParent.dir = 'row';
                 newParent.addChild(dp, false);
-                newParent.addChild(newSibling);                
+                newParent.addChild(newSibling);
                 break;
 
             case 'right':
@@ -274,10 +297,12 @@ export default class SupergridRootView extends Vue {
 
         this.data.cleanup();
 
+        this.dragPanel = null;
+
         // This is important!:
         foo.$parent.$forceUpdate();
 
-        this.dragPanel = null;
+        //########################### END Drop drag panel #############################
     }
 }
 </script>
@@ -288,7 +313,7 @@ div.vuety-supergrid-root {
     display: flex;
     flex: 1;
 
-  
+
 
     div.mover {
         // border: 1px solid #aaa;

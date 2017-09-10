@@ -27,10 +27,10 @@ export default class SupergridPanelView extends Vue {
     }
 
     onCloseButtonClick(evt: MouseEvent) {
-       
+
         evt.stopPropagation();
         evt.stopImmediatePropagation();
-        
+
         this.data.parent.removeChild(this.data);
     }
 
@@ -47,6 +47,11 @@ div.vuety-supergrid-panel {
     display: flex;
     flex-direction: column;
 
+    &.dragged {
+        border: 4px solid #f00 !important;
+    }
+
+
     >h1.header {
 
         color: #fff;
@@ -60,6 +65,7 @@ div.vuety-supergrid-panel {
             background-color: #aaf; //  background-color: #999;
             cursor: move;
         }
+
 
         span.closeButton {
             border-radius: 4px;

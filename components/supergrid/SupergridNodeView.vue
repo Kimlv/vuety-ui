@@ -67,6 +67,8 @@ export default class SupergridNodeView extends Vue {
 
     getPanelUnder(x: number, y: number): SupergridNodeView | SupergridPanelView | null {
 
+        
+
         //#################### BEGIN Update active resize node #######################
         // Horizontal:
         let foo = (x - (this.rootDiv.offsetLeft + this.rootDiv.offsetWidth * this.data.divider));
