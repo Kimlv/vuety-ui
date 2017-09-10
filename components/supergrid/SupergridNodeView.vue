@@ -162,7 +162,6 @@ div.vuety-supergrid-node {
     flex:1; // Important!
     flex-basis:auto; // Important!
     
-
     &.col {
         flex-direction: column;
     }

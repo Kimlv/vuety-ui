@@ -242,6 +242,8 @@ export default class SupergridRootView extends Vue {
         let newParent = new SupergridNode();
         grandparent.children[si] = newParent;
 
+        console.log(this.insertMode);
+
         let dp = (<SupergridPanelView>this.dragPanel).data;
 
         switch (this.insertMode) {
@@ -258,15 +260,15 @@ export default class SupergridRootView extends Vue {
                 break;
 
             case 'left':
-                newParent.dir = 'row';
-                newParent.addChild(dp, true);
-                newParent.addChild(newSibling);
+                newParent.dir = 'row';                
+                newParent.addChild(dp, false);
+                newParent.addChild(newSibling);                
                 break;
 
             case 'right':
                 newParent.dir = 'row';
                 newParent.addChild(newSibling);
-                newParent.addChild(dp, true);
+                newParent.addChild(dp, false);
                 break;
         }
 
