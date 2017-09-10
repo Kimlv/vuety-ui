@@ -25,10 +25,16 @@ import SupergridPanelView from './SupergridPanelView.vue'
     name: 'supergrid-node-view'
 })
 export default class SupergridNodeView extends Vue {
-
+    
+    //######### BEGIN Props ##########
     @Prop()
     data: SupergridNode;
+    //######### END Props ##########
 
+    resizeHandleWidth: number = 5;
+
+
+    //################## BEGIN Computed Properties ###################
     get root(): SupergridRootView {
         let result: SupergridNodeView = this;
 
@@ -43,6 +49,7 @@ export default class SupergridNodeView extends Vue {
     get rootDiv(): HTMLDivElement {
         return <HTMLDivElement>this.$refs.rootDiv;
     }
+    //################## END Computed Properties ###################
 
 
     getComponentClass(child: any): string {
@@ -64,7 +71,8 @@ export default class SupergridNodeView extends Vue {
         // Horizontal:
         let foo = (x - (this.rootDiv.offsetLeft + this.rootDiv.offsetWidth * this.data.divider));
 
-        if (Math.abs(foo) < 5 && this.data.dir == "row") {
+
+        if (Math.abs(foo) < this.resizeHandleWidth && this.data.dir == "row") {
             this.root.resizeNode = this;
             this.root.rootDiv.style.cursor = "ew-resize";
         }
@@ -72,7 +80,7 @@ export default class SupergridNodeView extends Vue {
         // Vertical:
         let foo2 = (y - (this.rootDiv.offsetTop + this.rootDiv.offsetHeight * this.data.divider));
 
-        if (Math.abs(foo2) < 5 && this.data.dir == "col") {
+        if (Math.abs(foo2) < this.resizeHandleWidth && this.data.dir == "col") {
             this.root.resizeNode = this;
             this.root.rootDiv.style.cursor = "ns-resize";
         }
@@ -96,7 +104,6 @@ export default class SupergridNodeView extends Vue {
             return this;
         }
         //######################## END Allow attach to outer borders on root level ###################
-
 
 
         //################### BEGIN Recursive search for panel under mouse ###################
@@ -151,10 +158,10 @@ export default class SupergridNodeView extends Vue {
 div.vuety-supergrid-node {
 
     align-items: stretch;
-    display: flex;
-
-    // Important!:
+    display: flex; 
     flex:1;
+    flex-basis:auto; // Important!
+    
 
     &.col {
         flex-direction: column;

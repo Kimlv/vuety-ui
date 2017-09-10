@@ -12,7 +12,6 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
 import { SupergridNode } from './SupergridNode'
 import { SupergridPanel } from './SupergridPanel'
 
-
 import SupergridNodeView from './SupergridNodeView.vue'
 import SupergridPanelView from './SupergridPanelView.vue'
 
@@ -28,7 +27,7 @@ export default class SupergridRootView extends Vue {
     data: SupergridNode;
     //######### END Props ##########
 
-
+    //################# BEGIN Misc properties ###################
     dragPanel: SupergridPanelView | null;
 
     insertMode: string = "top";
@@ -38,13 +37,12 @@ export default class SupergridRootView extends Vue {
 
     resize: boolean = false;
     resizeNode: SupergridNodeView | null = null;
-
+    //################# END Misc properties ###################
 
     //################## BEGIN Computed Properties ###################
     get mover(): HTMLDivElement {
         return <HTMLDivElement>this.$refs.mover;
     }
-
 
     get nodeView(): SupergridNodeView {
         return <SupergridNodeView>this.$refs.nodeView;
@@ -55,15 +53,11 @@ export default class SupergridRootView extends Vue {
     }
     //################## END Computed Properties ###################
 
-
-
-
     onMouseDown(evt: MouseEvent) {
 
         if (this.resizeNode != null) {
             this.resize = true;
         }
-
 
         if (this.dragPanel != null && this.resizeNode == null) {
 
@@ -83,7 +77,6 @@ export default class SupergridRootView extends Vue {
             this.dragOffsetY = evt.clientY - div.offsetTop;
         }
     }
-
 
     onMouseMove(evt: MouseEvent) {
 
@@ -180,11 +173,9 @@ export default class SupergridRootView extends Vue {
             this.mover.style.height = div.offsetHeight / 2 + 'px';
 
             this.insertMode = "bottom";
-
         }
         //########### END If we are at a valid drop location, highlight new sibling and update mover ############
     }
-
 
     onMouseUp(evt: MouseEvent) {
 
@@ -194,6 +185,11 @@ export default class SupergridRootView extends Vue {
 
 
         if (this.dragPanel == null) {
+            return;
+        }
+
+        if (['top', 'bottom', 'left', 'right'].indexOf(this.insertMode) < 0) {
+            console.log("Invalid insert mode!");
             return;
         }
 
@@ -215,9 +211,7 @@ export default class SupergridRootView extends Vue {
             return;
         }
 
-
         let grandparent = newSibling.parent;
-        
 
         //########### BEGIN If newSibling is the root element, add a new root to the hierarchy ###########
         if (grandparent == null) {
@@ -235,12 +229,10 @@ export default class SupergridRootView extends Vue {
             }
 
             grandparent.children = [newSibling];
-            grandparent.divider = 0.5;
         }
         //########### END If newSibling is the root element, add a new root to the hierarchy ###########
 
         let si = grandparent.children.indexOf(newSibling);
-
 
         if (si < 0) {
             this.dragPanel = null;
@@ -248,36 +240,33 @@ export default class SupergridRootView extends Vue {
         }
 
         let newParent = new SupergridNode();
+        grandparent.children[si] = newParent;
 
         let dp = (<SupergridPanelView>this.dragPanel).data;
 
         switch (this.insertMode) {
             case 'top':
-                grandparent.children[si] = newParent;
                 newParent.dir = 'col';
                 newParent.addChild(dp, false);
                 newParent.addChild(newSibling);
                 break;
 
             case 'bottom':
-                grandparent.children[si] = newParent;
                 newParent.dir = 'col';
                 newParent.addChild(newSibling);
                 newParent.addChild(dp, false);
                 break;
 
             case 'left':
-                grandparent.children[si] = newParent;
                 newParent.dir = 'row';
-                newParent.addChild(dp);
+                newParent.addChild(dp, true);
                 newParent.addChild(newSibling);
                 break;
 
             case 'right':
-                grandparent.children[si] = newParent;
                 newParent.dir = 'row';
                 newParent.addChild(newSibling);
-                newParent.addChild(dp);
+                newParent.addChild(dp, true);
                 break;
         }
 
@@ -293,18 +282,11 @@ export default class SupergridRootView extends Vue {
 
 <style lang="scss">
 div.vuety-supergrid-root {
-    //  border: 1px dashed #00f; //  background-color: #fff !important;
     align-items: stretch;
     display: flex;
+    flex: 1;
 
-
-    &.col {
-        flex-direction: column;
-    }
-
-    &.row {
-        flex-direction: row;
-    }
+  
 
     div.mover {
         // border: 1px solid #aaa;
