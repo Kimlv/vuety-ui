@@ -159,7 +159,7 @@ div.vuety-supergrid-node {
 
     align-items: stretch;
     display: flex; 
-    flex:1;
+    flex:1; // Important!
     flex-basis:auto; // Important!
     
 
