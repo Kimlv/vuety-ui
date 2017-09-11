@@ -9,8 +9,22 @@ export class SupergridNode {
     parent: SupergridNode | null;
 
 
-    children: Array<SupergridNode | SupergridPanel> = [];
+    private pChildren: Array<SupergridNode | SupergridPanel> = [];
 
+
+    
+    get children() : Array<SupergridNode | SupergridPanel> {
+        return this.pChildren;
+    }
+
+    set children(v : Array<SupergridNode | SupergridPanel>) {
+        this.pChildren = v;
+
+        for (let child of this.pChildren) {
+            child.parent = this;
+        }
+
+    }
 
     get root(): SupergridNode {
 

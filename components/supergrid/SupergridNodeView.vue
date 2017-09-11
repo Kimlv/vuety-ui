@@ -25,7 +25,7 @@ import SupergridPanelView from './SupergridPanelView.vue'
     name: 'supergrid-node-view'
 })
 export default class SupergridNodeView extends Vue {
-    
+
     //######### BEGIN Props ##########
     @Prop()
     data: SupergridNode;
@@ -65,9 +65,8 @@ export default class SupergridNodeView extends Vue {
         return "";
     }
 
-    getPanelUnder(x: number, y: number): SupergridNodeView | SupergridPanelView | null {
 
-        
+    getPanelUnder(x: number, y: number): SupergridNodeView | SupergridPanelView | null {
 
         //#################### BEGIN Update active resize node #######################
         // Horizontal:
@@ -90,20 +89,23 @@ export default class SupergridNodeView extends Vue {
 
         //######################## BEGIN Allow attach to outer borders on root level ###################
 
-        // TODO: 2 Move this to SupergridRootView
-        let myDiv = this.rootDiv;
-        let border = 20;
+        // NOTE: Enabling this for child nodes works, but is confusing to the user due to misleading visualization.
+        if (this.$parent == this.root) {
+            // TODO: 3 Move this to SupergridRootView
+            let myDiv = this.rootDiv;
+            let border = 20;
 
-        if ((x > myDiv.offsetLeft && x < myDiv.offsetLeft + border) ||
-            (x > myDiv.offsetLeft + myDiv.offsetWidth - border && x < myDiv.offsetLeft + myDiv.offsetWidth)
+            if ((x > myDiv.offsetLeft && x < myDiv.offsetLeft + border) ||
+                (x > myDiv.offsetLeft + myDiv.offsetWidth - border && x < myDiv.offsetLeft + myDiv.offsetWidth)
 
-            ||
+                ||
 
-            (y > myDiv.offsetTop && y < myDiv.offsetTop + border) ||
-            (y > myDiv.offsetTop + myDiv.offsetHeight - border && y < myDiv.offsetTop + myDiv.offsetHeight)
+                (y > myDiv.offsetTop && y < myDiv.offsetTop + border) ||
+                (y > myDiv.offsetTop + myDiv.offsetHeight - border && y < myDiv.offsetTop + myDiv.offsetHeight)
 
-        ) {
-            return this;
+            ) {
+                return this;
+            }
         }
         //######################## END Allow attach to outer borders on root level ###################
 
@@ -160,10 +162,9 @@ export default class SupergridNodeView extends Vue {
 div.vuety-supergrid-node {
 
     align-items: stretch;
-    display: flex; 
-    flex:1; // Important!
-    flex-basis:auto; // Important!
-    
+    display: flex;
+    flex: 1; // Important!
+    flex-basis: auto; // Important!
     &.col {
         flex-direction: column;
     }
