@@ -98,16 +98,22 @@ export default class SupergridRootView extends Vue {
 
     onMouseDown(evt: MouseEvent) {
 
+
+
         if (this.resizeNode != null) {
             this.resize = true;
         }
 
-        if (this.dragPanel != null && this.resizeNode == null) {
+        if (this.dragPanel != null) {
+            evt.preventDefault();
 
-            let div = this.dragPanel.rootDiv;
+            if (this.resizeNode == null) {
 
-            this.dragOffsetX = evt.clientX - div.offsetLeft;
-            this.dragOffsetY = evt.clientY - div.offsetTop;
+                let div = this.dragPanel.rootDiv;
+
+                this.dragOffsetX = evt.clientX - div.offsetLeft;
+                this.dragOffsetY = evt.clientY - div.offsetTop;
+            }
         }
     }
 
@@ -275,7 +281,7 @@ export default class SupergridRootView extends Vue {
 
         }
         else {
-        
+
             let newParent = new SupergridNode();
 
             let si = grandparent.children.indexOf(newSibling);
@@ -320,9 +326,9 @@ export default class SupergridRootView extends Vue {
 <style lang="scss">
 div.vuety-supergrid-root {
     align-items: stretch;
-    display: flex;    
+    display: flex;
     flex: 1;
-    height:100%;
+    height: 100%;
 
     div.mover {
         background-color: rgba(255, 255, 0, 0.5);
