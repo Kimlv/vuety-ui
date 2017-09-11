@@ -101,6 +101,7 @@ export default class SupergridRootView extends Vue {
 
 
         if (this.resizeNode != null) {
+            evt.preventDefault();
             this.resize = true;
         }
 
