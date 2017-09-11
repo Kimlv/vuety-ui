@@ -6,25 +6,14 @@ export class SupergridPanel {
     parent: SupergridNode;
     title: string = "Untitled Panel";
 
-    image: string;
     bgColor: string;
 
-    component: string;
+    componentName: string;
+    componentProps : any = {};
 
-
-    constructor(title: string, component: string = "") {
+    constructor(title: string, componentName: string = "", componentProps = {}) {
         this.title = title;
-        this.component = component;
-    }
-
-    get root(): SupergridNode {
-
-        let result: SupergridNode = this.parent;
-
-        while (result.parent != null) {
-            result = result.parent;
-        }
-
-        return result;
+        this.componentName = componentName;
+        this.componentProps = componentProps;
     }
 }

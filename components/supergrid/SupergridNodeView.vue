@@ -1,7 +1,7 @@
 <template>
     <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir">
-        <template v-for="(child, index) of data.children">
-            <compontent :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />
+        <template v-for="(child, index) of data.children">            
+            <compontent :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />            
         </template>
     </div>
 </template>
