@@ -45,13 +45,13 @@ export default class OlMapPanel extends Vue {
 
 
     onMapMoveend(evt: ol.MapBrowserEvent) {
-        console.log("moveend");
-        this.$emit('mapClick', evt);
+        //console.log("moveend");
+        //this.$emit('mapClick', evt);
     }
 
     onMapSingleclick(evt: ol.MapBrowserEvent) {
-        console.log("click");
-        this.$emit('mapClick', evt);
+        //console.log("click");
+        //this.$emit('mapClick', evt);
     }
 }
 </script>

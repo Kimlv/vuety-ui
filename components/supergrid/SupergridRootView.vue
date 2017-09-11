@@ -320,8 +320,9 @@ export default class SupergridRootView extends Vue {
 <style lang="scss">
 div.vuety-supergrid-root {
     align-items: stretch;
-    display: flex;
+    display: flex;    
     flex: 1;
+    height:100%;
 
     div.mover {
         background-color: rgba(255, 255, 0, 0.5);

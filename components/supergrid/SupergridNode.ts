@@ -12,7 +12,7 @@ export class SupergridNode {
     private pChildren: Array<SupergridNode | SupergridPanel> = [];
 
 
-    
+    //################### BEGIN Computed Properties ###################
     get children() : Array<SupergridNode | SupergridPanel> {
         return this.pChildren;
     }
@@ -36,8 +36,15 @@ export class SupergridNode {
 
         return result;
     }
+    //################### END Computed Properties ###################
 
-    addChild(child: SupergridNode | SupergridPanel, front: boolean = false) {
+    
+    addChild(child: SupergridNode | SupergridPanel, front: boolean = false) : boolean {
+
+        if (this.children.length > 1) {
+            console.warn("A SupergridNode can't have more then two children!");
+            return false;
+        }
 
         if (child.parent != null) {
             child.parent.removeChild(child);
@@ -51,6 +58,8 @@ export class SupergridNode {
         }
 
         child.parent = this;
+
+        return true;
     }
 
 
