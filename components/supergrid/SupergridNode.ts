@@ -105,35 +105,47 @@ export class SupergridNode {
 
     cleanup() {
 
-        if (this.children.length == 0) {
+        //################ BEGIN Remove empty child nodes ###################
+        let children = [];
 
-            if (this.parent != null) {
-                this.parent.removeChild(this);
-            }
-        }
-        else {
-            for (let child of this.children) {
-
-                if (child instanceof SupergridNode) {
-                    child.cleanup();
-                }
+        for (let child of this.children) {
+            if (!(child instanceof SupergridNode && child.children.length == 0)) {
+                children.push(child);
             }
         }
 
+        this.children = children;
+        //################ END Remove empty child nodes ###################
 
-        if (this != this.root && this.children.length == 1 && this.children[0] instanceof SupergridNode) {
+
+
+        for (let child of this.children) {
+
+            if (child instanceof SupergridNode)
+                child.cleanup();
+
+        }
+
+
+
+
+        if (this.children.length == 1 && this.children[0] instanceof SupergridNode) {
             if (this.parent != null) {
                 let si = this.parent.children.indexOf(this);
-                this.children[0].parent = this.parent;
+
                 this.parent.children[si] = this.children[0];
+                this.parent.children[si].parent = this.parent;
 
 
             }
         }
+
 
     }
 
     removeChild(child: SupergridNode | SupergridPanel) {
+
+
         let index = this.children.indexOf(child);
 
         if (index > -1) {
@@ -142,12 +154,13 @@ export class SupergridNode {
 
 
 
-        if (this.children.length == 0 && this.parent != null) {
-            this.parent.removeChild(this);
-        }
 
 
         child.parent = null;
+
+        if (this.children.length == 0 && this.parent != null) {
+            this.parent.removeChild(this);
+        }
 
 
         if (this.activeTab == child) {

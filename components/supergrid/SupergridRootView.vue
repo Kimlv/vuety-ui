@@ -57,7 +57,6 @@ export default class SupergridRootView extends Vue {
 
         if (v != null) {
 
-            console.log("start drag!");
 
             this.resizeNode = null;
             this.resize = false;
@@ -152,7 +151,7 @@ export default class SupergridRootView extends Vue {
         this.rootDiv.style.cursor = "default";
 
         // ATTENTION: getPanelUnder() must be called HERE to show the resize cursor!!!
-        let panelUnderMouse = <SupergridPanelView | null>this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
+        let panelUnderMouse = <SupergridNodeView | null>this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
 
 
         if (this.dragPanel == null) {
@@ -175,7 +174,7 @@ export default class SupergridRootView extends Vue {
         this.insertMode = '';
 
         // TODO: 2 Reimplement this
-        if (panelUnderMouse == null || panelUnderMouse.data == this.dragPanel) {
+        if (panelUnderMouse == null) {
 
             return;
         }
@@ -265,20 +264,24 @@ export default class SupergridRootView extends Vue {
 
         let dropNode = dropNodeView.data;
 
-
-
-        if (dragPanel.parent == dropNode && dropNode.childPanels.length == 1) {
-            console.log("Drop on self!");
+        if (dropNode == dragPanel.parent && dropNode.children.length == 1) {
+            console.log("drop on self!");
             return;
         }
 
+
         if (this.insertMode == 'center') {
+
+
 
             dropNode.addChild(dragPanel);
             dropNode.activeTab = dragPanel;
         }
         else {
-          
+
+
+
+
             if (dropNode.parent == null) {
 
                 dropNode = new SupergridNode();
@@ -301,14 +304,15 @@ export default class SupergridRootView extends Vue {
 
 
             grandparent.addChild(dropNode);
+            dropNode.parent = grandparent;
 
             let newParent = new SupergridNode();
 
             // TODO: 1 Understand why we need this to avoid layout bugs
-            newParent.parent = grandparent;
+
 
             newParent.addChild(dragPanel);
-
+            newParent.parent = grandparent;
 
 
             switch (this.insertMode) {
@@ -340,9 +344,14 @@ export default class SupergridRootView extends Vue {
 
         this.data.cleanup();
 
+
+        //if (this.pDragNodeView != null) this.pDragNodeView.$parent.$forceUpdate();
+
         // Important!
         dropNodeView.$parent.$forceUpdate();
         //########################### END Drop drag panel #############################
+
+
     }
 }
 </script>
