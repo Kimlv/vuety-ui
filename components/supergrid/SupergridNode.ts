@@ -2,13 +2,13 @@ import { SupergridPanel } from './SupergridPanel'
 
 export class SupergridNode {
 
-    
+
     divider: number = 0.5;
     pActiveTab: SupergridPanel | null = null;
     parent: SupergridNode | null;
 
 
-     children: Array<SupergridNode | SupergridPanel> = [];
+    children: Array<SupergridNode | SupergridPanel> = [];
     private pDir: string = "row";
 
 
@@ -120,19 +120,17 @@ export class SupergridNode {
             }
         }
 
-        // TODO: 3 Fix cleanup
 
-        /*
-        if (this.children.length == 1 && this.children[0] instanceof SupergridNode) {
+        if (this != this.root && this.children.length == 1 && this.children[0] instanceof SupergridNode) {
             if (this.parent != null) {
                 let si = this.parent.children.indexOf(this);
                 this.children[0].parent = this.parent;
                 this.parent.children[si] = this.children[0];
 
-                
+
             }
         }
-        */
+
     }
 
     removeChild(child: SupergridNode | SupergridPanel) {
