@@ -1,8 +1,36 @@
 <template>
     <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir">
-        <template v-for="(child, index) of data.children">            
-            <compontent :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />            
+
+        <!--#################### BEGIN Stacked (tabs) view #########################-->
+        <div class="tabs" v-if="data.dir=='tabs'">
+
+            <ul role="tablist">
+                <li v-for="(panel, index) in data.childPanels">
+
+                    <span class="handle" @mousedown="onTabMouseDown($event, panel)">|||</span>
+                    <span class="title" @click="onTabClick($event, panel)">{{panel.title}}</span>
+                    <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)">X</span>
+                </li>
+            </ul>
+
+            <template v-for="(panel, index) of data.childPanels">
+<!--
+                <supergrid-panel-tab-view :data="panel" class="tab" :style="tabInlineStyle(panel)" />
+-->
+                <component :is="panel.componentName" v-bind="panel.componentProps" class="tab" :style="tabInlineStyle(panel)"/>
+            </template>
+
+        </div>
+        <!--#################### END Stacked (tabs) view #########################-->
+
+        <!--#################### BEGIN "normal" view #########################-->
+        <template v-else>
+            <template v-for="(child, index) of data.children">
+                <component :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />
+            </template>
         </template>
+        <!--#################### END "normal" view #########################-->
+
     </div>
 </template>
 
@@ -20,6 +48,7 @@ import SupergridPanelView from './SupergridPanelView.vue'
 
     components: {
         'supergrid-panel-view': SupergridPanelView
+    
     },
 
     name: 'supergrid-node-view'
@@ -89,6 +118,7 @@ export default class SupergridNodeView extends Vue {
 
         //######################## BEGIN Allow attach to outer borders on root level ###################
 
+        
         // NOTE: Enabling this for child nodes works, but is confusing to the user due to misleading visualization.
         if (this.$parent == this.root) {
             // TODO: 3 Move this to SupergridRootView
@@ -107,8 +137,12 @@ export default class SupergridNodeView extends Vue {
                 return this;
             }
         }
+        
         //######################## END Allow attach to outer borders on root level ###################
 
+        if (this.data.dir == "tabs") {
+            return this;
+        }
 
         //################### BEGIN Recursive search for panel under mouse ###################
         for (let child of this.$children) {
@@ -155,6 +189,34 @@ export default class SupergridNodeView extends Vue {
 
         return dir1 + ": " + size + "%;" + dir2 + ": 100%";
     }
+
+    onTabClick(evt: MouseEvent, panel: SupergridPanel) {
+        //(<SupergridNodeView>this.$parent).root.dragPanel = panel;
+        this.data.activeTab = panel;
+    }
+
+
+    onTabCloseClick(evt: MouseEvent, panel: SupergridPanel) {
+
+        evt.stopPropagation();
+        evt.stopImmediatePropagation();
+
+        
+            this.data.removeChild(panel);
+        
+    }
+
+    onTabMouseDown(evt: MouseEvent, panel: SupergridPanel | null) {
+        (<SupergridNodeView>this.$parent).root.dragPanel = panel;
+    }
+
+    tabInlineStyle(panel: SupergridPanel): string {
+
+        if (this.data.activeTab == panel) {
+            return "display:block;";
+        }
+        return "display:none";
+    }
 }
 </script>
 
@@ -171,6 +233,38 @@ div.vuety-supergrid-node {
 
     &.row {
         flex-direction: row;
+    }
+
+    >div.tabs {
+            border: 1px solid #aaa;
+
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        
+        span.handle {
+            cursor:move;
+        }
+
+        > div.tab {
+            overflow:auto;
+        }
+
+        >ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            >li {
+                display: inline-block;
+                padding: 4px;
+
+                &:hover {
+                    background-color: #ccc;
+                }
+            }
+        }
     }
 }
 </style>

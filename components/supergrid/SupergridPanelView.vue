@@ -1,11 +1,13 @@
 <template>
     <div ref="rootDiv" class="vuety-supergrid-panel">
+        
         <h1 class="header" @mousedown="onMouseDown"> {{data.title}}
             <span v-if="data.isCloseable" class="closeButton" @mousedown="onCloseButtonClick">X</span>
         </h1>
+                
         <div class="content">            
             <component :is="data.componentName" v-bind="data.componentProps" />   
-        </div>
+        </div>        
     </div>
 </template>
 
@@ -35,7 +37,7 @@ export default class SupergridPanelView extends Vue {
     }
 
     onMouseDown(evt: MouseEvent) {
-        (<SupergridNodeView>this.$parent).root.dragPanel = this;
+        (<SupergridNodeView>this.$parent).root.dragPanel = this.data;
     }
 }
 </script>
@@ -81,20 +83,6 @@ div.vuety-supergrid-panel {
                 background-color: rgba(255, 255, 255, 0.5);
             }
         }
-
-/*
-        -webkit-touch-callout: none;
-       
-        -webkit-user-select: none;
-      
-        -khtml-user-select: none;
-      
-        -moz-user-select: none;
-       
-        -ms-user-select: none;
-        
-        user-select: none;
-       */
     }
 
     >div.content {

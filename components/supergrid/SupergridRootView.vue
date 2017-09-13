@@ -32,7 +32,7 @@ export default class SupergridRootView extends Vue {
     //################# BEGIN Misc properties ###################
 
     // NOTE: pDragPanel must be initialized!!
-    pDragPanel: SupergridPanelView | null = null;
+    pDragPanel: SupergridPanel | null = null;
 
     insertMode: string = "top";
 
@@ -48,32 +48,40 @@ export default class SupergridRootView extends Vue {
 
     //################## BEGIN Computed Properties ###################
 
-    get dragPanel(): SupergridPanelView | null {
+    get dragPanel(): SupergridPanel | null {
         return this.pDragPanel;
     }
 
-    set dragPanel(v: SupergridPanelView | null) {
+    set dragPanel(v: SupergridPanel | null) {
 
         if (v != null) {
+
+            console.log("start drag!");
+
             this.resizeNode = null;
             this.resize = false;
 
             this.pDragPanel = v;
-            this.pDragPanel.rootDiv.classList.add('dragged');
 
-            //########## BEGIN Update mover style #############
-            let div = this.pDragPanel.rootDiv;
 
             this.mover.style.display = 'block';
-            this.mover.style.width = div.offsetWidth + 'px';
-            this.mover.style.height = div.offsetHeight + 'px';
-            this.mover.style.left = div.offsetLeft + 'px';
-            this.mover.style.top = div.offsetTop + 'px';
+            //  this.pDragPanel.rootDiv.classList.add('dragged');
+
+            //########## BEGIN Update mover style #############
+            /*
+            let div = this.pDragPanel.rootDiv;
+ 
+             
+             this.mover.style.width = div.offsetWidth + 'px';
+             this.mover.style.height = div.offsetHeight + 'px';
+             this.mover.style.left = div.offsetLeft + 'px';
+             this.mover.style.top = div.offsetTop + 'px';
+             */
             //########## END Update mover style #############
         }
         else {
             if (this.pDragPanel != null) {
-                this.pDragPanel.rootDiv.classList.remove('dragged');
+                //     this.pDragPanel.rootDiv.classList.remove('dragged');
             }
 
             this.pDragPanel = v;
@@ -109,11 +117,12 @@ export default class SupergridRootView extends Vue {
             evt.preventDefault();
 
             if (this.resizeNode == null) {
-
-                let div = this.dragPanel.rootDiv;
-
-                this.dragOffsetX = evt.clientX - div.offsetLeft;
-                this.dragOffsetY = evt.clientY - div.offsetTop;
+                /*
+                                let div = this.dragPanel.rootDiv;
+                
+                                this.dragOffsetX = evt.clientX - div.offsetLeft;
+                                this.dragOffsetY = evt.clientY - div.offsetTop;
+                                */
             }
         }
     }
@@ -150,8 +159,8 @@ export default class SupergridRootView extends Vue {
         //############ BEGIN Update mover size and position ###############
 
         // NOTE: Updating mover width and height here is REQUIRED because it is changed by "snapping".
-        this.mover.style.width = this.dragPanel.rootDiv.offsetWidth + 'px';
-        this.mover.style.height = this.dragPanel.rootDiv.offsetHeight + 'px';
+        //  this.mover.style.width = this.dragPanel.rootDiv.offsetWidth + 'px';
+        //this.mover.style.height = this.dragPanel.rootDiv.offsetHeight + 'px';
 
         this.mover.style.left = (evt.clientX - this.dragOffsetX) + 'px';
         this.mover.style.top = (evt.clientY - this.dragOffsetY) + 'px';
@@ -162,7 +171,9 @@ export default class SupergridRootView extends Vue {
 
         this.insertMode = '';
 
-        if (panelUnderMouse == null || panelUnderMouse == this.dragPanel) {
+        // TODO: 2 Reimplement this
+        if (panelUnderMouse == null || panelUnderMouse.data == this.dragPanel) {
+
             return;
         }
 
@@ -233,12 +244,12 @@ export default class SupergridRootView extends Vue {
             return;
         }
 
-        let dragPanel = (<SupergridPanelView>this.dragPanel).data;
+        let dragPanel = this.dragPanel; //(<SupergridPanelView>this.dragPanel).data;
 
         this.dragPanel = null;
 
         if (['bottom', 'center', 'left', 'right', 'top'].indexOf(this.insertMode) < 0) {
-            console.log("Invalid insert mode!");
+            console.log("Invalid insert mode: " + this.insertMode);
             return;
         }
 
@@ -280,6 +291,42 @@ export default class SupergridRootView extends Vue {
 
         if (this.insertMode == 'center') {
 
+     
+            if (dropTarget instanceof SupergridNodeView) {
+
+                if (dragPanel.parent == newSibling) {
+                    console.log("drop on self");
+                    return;
+                }
+
+                (<SupergridNode>newSibling).dir = "tabs";
+
+                (<SupergridNode>newSibling).addChild(dragPanel);
+
+                (<SupergridNodeView>dropTarget).data.activeTab = dragPanel;
+
+                dropTarget.$forceUpdate();
+            }
+            else {
+
+                // TODO: 2 This is very similar to cases below. Merge!
+                let newParent = new SupergridNode();
+
+                let si = grandparent.children.indexOf(newSibling);
+                grandparent.children[si] = newParent;
+
+                newParent.addChild(newSibling);
+
+                newParent.dir = "tabs";
+
+                console.log("Drop on tab!");
+                // TODO: 2 This is ugly and brittle
+                newParent.addChild(dragPanel);
+
+                newParent.activeTab = dragPanel;
+
+            }
+
         }
         else {
 
@@ -296,6 +343,8 @@ export default class SupergridRootView extends Vue {
                     newParent.dir = 'col';
                     newParent.addChild(dragPanel, false);
                     break;
+
+
 
                 case 'left':
                     newParent.dir = 'row';
@@ -315,6 +364,8 @@ export default class SupergridRootView extends Vue {
         }
 
         this.data.cleanup();
+
+
 
         // This is important!:
         dropTarget.$parent.$forceUpdate();

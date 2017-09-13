@@ -3,8 +3,21 @@ import { SupergridPanel } from './SupergridPanel'
 export class SupergridNode {
 
     dir: string = "row";
-    divider : number = 0.5;
+    divider: number = 0.5;
 
+    pActiveTab : SupergridPanel | null = null;
+
+    get activeTab() : SupergridPanel {
+        if (this.pActiveTab != null) {
+            return this.pActiveTab;
+        }
+
+        return this.childPanels[0];
+    }
+
+    set activeTab(v : SupergridPanel) {
+        this.pActiveTab =v;
+    }
 
     parent: SupergridNode | null;
 
@@ -12,12 +25,24 @@ export class SupergridNode {
     private pChildren: Array<SupergridNode | SupergridPanel> = [];
 
 
+    get childPanels(): Array<SupergridPanel> {
+        let result: Array<SupergridPanel> = [];
+
+        for (let child of this.pChildren) {
+            if (child instanceof SupergridPanel) {
+                result.push(child);
+            }
+        }
+
+        return result;
+    }
+
     //################### BEGIN Computed Properties ###################
-    get children() : Array<SupergridNode | SupergridPanel> {
+    get children(): Array<SupergridNode | SupergridPanel> {
         return this.pChildren;
     }
 
-    set children(v : Array<SupergridNode | SupergridPanel>) {
+    set children(v: Array<SupergridNode | SupergridPanel>) {
         this.pChildren = v;
 
         for (let child of this.pChildren) {
@@ -38,14 +63,14 @@ export class SupergridNode {
     }
     //################### END Computed Properties ###################
 
-    
-    addChild(child: SupergridNode | SupergridPanel, front: boolean = false) : boolean {
 
-        if (this.children.length > 1) {
-            console.warn("A SupergridNode can't have more then two children!");
-            return false;
-        }
-
+    addChild(child: SupergridNode | SupergridPanel, front: boolean = false): SupergridNode | SupergridPanel {
+        /*
+                if (this.children.length > 1) {
+                    console.warn("A SupergridNode can't have more then two children!");
+                    return false;
+                }
+        */
         if (child.parent != null) {
             child.parent.removeChild(child);
         }
@@ -59,7 +84,7 @@ export class SupergridNode {
 
         child.parent = this;
 
-        return true;
+        return child;
     }
 
 
@@ -89,7 +114,17 @@ export class SupergridNode {
             this.children.splice(index, 1);
         }
 
+       
+        if (this.activeTab == child) {
+            this.pActiveTab = null;
+        }
+
         child.parent = null;
+
+        if (this.children.length == 1) {
+            this.dir = "col";
+        }
+        
 
         if (this.children.length == 0 && this.parent != null) {
             this.parent.removeChild(this);
