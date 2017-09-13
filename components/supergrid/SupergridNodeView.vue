@@ -2,22 +2,19 @@
     <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir">
 
         <!--#################### BEGIN Stacked (tabs) view #########################-->
-        <div class="tabs" v-if="data.dir=='tabs'">
+        <div class="tabs" v-if="data.childPanels.length > 0">
 
             <ul role="tablist">
                 <li v-for="(panel, index) in data.childPanels">
-
                     <span class="handle" @mousedown="onTabMouseDown($event, panel)">|||</span>
                     <span class="title" @click="onTabClick($event, panel)">{{panel.title}}</span>
                     <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)">X</span>
                 </li>
             </ul>
 
+            <!-- Here go the tabs: -->
             <template v-for="(panel, index) of data.childPanels">
-<!--
-                <supergrid-panel-tab-view :data="panel" class="tab" :style="tabInlineStyle(panel)" />
--->
-                <component :is="panel.componentName" v-bind="panel.componentProps" class="tab" :style="tabInlineStyle(panel)"/>
+                <component :is="panel.componentName" v-bind="panel.componentProps" class="tab" :style="tabInlineStyle(panel)" />
             </template>
 
         </div>
@@ -48,7 +45,7 @@ import SupergridPanelView from './SupergridPanelView.vue'
 
     components: {
         'supergrid-panel-view': SupergridPanelView
-    
+
     },
 
     name: 'supergrid-node-view'
@@ -95,7 +92,7 @@ export default class SupergridNodeView extends Vue {
     }
 
 
-    getPanelUnder(x: number, y: number): SupergridNodeView | SupergridPanelView | null {
+    getPanelUnder(x: number, y: number): SupergridNodeView | null {
 
         //#################### BEGIN Update active resize node #######################
         // Horizontal:
@@ -118,10 +115,10 @@ export default class SupergridNodeView extends Vue {
 
         //######################## BEGIN Allow attach to outer borders on root level ###################
 
-        
+
         // NOTE: Enabling this for child nodes works, but is confusing to the user due to misleading visualization.
         if (this.$parent == this.root) {
-            // TODO: 3 Move this to SupergridRootView
+
             let myDiv = this.rootDiv;
             let border = 20;
 
@@ -137,10 +134,10 @@ export default class SupergridNodeView extends Vue {
                 return this;
             }
         }
-        
+
         //######################## END Allow attach to outer borders on root level ###################
 
-        if (this.data.dir == "tabs") {
+        if (this.data.childPanels.length > 0) {
             return this;
         }
 
@@ -165,9 +162,7 @@ export default class SupergridNodeView extends Vue {
                         return bla;
                     }
                 }
-                else if (ac instanceof SupergridPanelView) {
-                    return ac;
-                }
+                
             }
         }
         //################### END Recursive search for panel under mouse ###################
@@ -201,13 +196,13 @@ export default class SupergridNodeView extends Vue {
         evt.stopPropagation();
         evt.stopImmediatePropagation();
 
-        
-            this.data.removeChild(panel);
-        
+        this.data.removeChild(panel);
     }
 
     onTabMouseDown(evt: MouseEvent, panel: SupergridPanel | null) {
-        (<SupergridNodeView>this.$parent).root.dragPanel = panel;
+        evt.preventDefault();
+        this.root.dragPanel = panel;
+        this.root.pDragNodeView = this;
     }
 
     tabInlineStyle(panel: SupergridPanel): string {
@@ -236,19 +231,19 @@ div.vuety-supergrid-node {
     }
 
     >div.tabs {
-            border: 1px solid #aaa;
+        border: 1px solid #aaa;
 
         display: flex;
         flex-direction: column;
         width: 100%;
         height: 100%;
-        
+
         span.handle {
-            cursor:move;
+            cursor: move;
         }
 
-        > div.tab {
-            overflow:auto;
+        >div.tab {
+            overflow: auto;
         }
 
         >ul {

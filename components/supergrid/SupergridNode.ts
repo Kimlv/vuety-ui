@@ -2,12 +2,29 @@ import { SupergridPanel } from './SupergridPanel'
 
 export class SupergridNode {
 
-    dir: string = "row";
+    
     divider: number = 0.5;
+    pActiveTab: SupergridPanel | null = null;
+    parent: SupergridNode | null;
 
-    pActiveTab : SupergridPanel | null = null;
 
-    get activeTab() : SupergridPanel {
+     children: Array<SupergridNode | SupergridPanel> = [];
+    private pDir: string = "row";
+
+
+    get dir(): string {
+
+
+        return this.pDir;
+    }
+
+    set dir(v: string) {
+        this.pDir = v;
+    }
+
+
+
+    get activeTab(): SupergridPanel {
         if (this.pActiveTab != null) {
             return this.pActiveTab;
         }
@@ -15,20 +32,16 @@ export class SupergridNode {
         return this.childPanels[0];
     }
 
-    set activeTab(v : SupergridPanel) {
-        this.pActiveTab =v;
+    set activeTab(v: SupergridPanel) {
+        this.pActiveTab = v;
     }
 
-    parent: SupergridNode | null;
-
-
-    private pChildren: Array<SupergridNode | SupergridPanel> = [];
 
 
     get childPanels(): Array<SupergridPanel> {
         let result: Array<SupergridPanel> = [];
 
-        for (let child of this.pChildren) {
+        for (let child of this.children) {
             if (child instanceof SupergridPanel) {
                 result.push(child);
             }
@@ -37,6 +50,7 @@ export class SupergridNode {
         return result;
     }
 
+    /*
     //################### BEGIN Computed Properties ###################
     get children(): Array<SupergridNode | SupergridPanel> {
         return this.pChildren;
@@ -50,6 +64,7 @@ export class SupergridNode {
         }
 
     }
+    */
 
     get root(): SupergridNode {
 
@@ -89,22 +104,35 @@ export class SupergridNode {
 
 
     cleanup() {
-        if (this.children.length == 1 && this.children[0] instanceof SupergridNode) {
 
-            let child = <SupergridNode>this.children[0];
+        if (this.children.length == 0) {
 
-            this.children = child.children;
-            this.dir = child.dir;
-        }
-
-        for (let child of this.children) {
-
-            child.parent = this;
-
-            if (child instanceof SupergridNode) {
-                child.cleanup();
+            if (this.parent != null) {
+                this.parent.removeChild(this);
             }
         }
+        else {
+            for (let child of this.children) {
+
+                if (child instanceof SupergridNode) {
+                    child.cleanup();
+                }
+            }
+        }
+
+        // TODO: 3 Fix cleanup
+
+        /*
+        if (this.children.length == 1 && this.children[0] instanceof SupergridNode) {
+            if (this.parent != null) {
+                let si = this.parent.children.indexOf(this);
+                this.children[0].parent = this.parent;
+                this.parent.children[si] = this.children[0];
+
+                
+            }
+        }
+        */
     }
 
     removeChild(child: SupergridNode | SupergridPanel) {
@@ -114,20 +142,20 @@ export class SupergridNode {
             this.children.splice(index, 1);
         }
 
-       
-        if (this.activeTab == child) {
-            this.pActiveTab = null;
-        }
 
-        child.parent = null;
-
-        if (this.children.length == 1) {
-            this.dir = "col";
-        }
-        
 
         if (this.children.length == 0 && this.parent != null) {
             this.parent.removeChild(this);
         }
+
+
+        child.parent = null;
+
+
+        if (this.activeTab == child) {
+            this.pActiveTab = null;
+        }
+
+
     }
 }

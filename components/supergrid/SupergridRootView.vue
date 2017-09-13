@@ -33,6 +33,7 @@ export default class SupergridRootView extends Vue {
 
     // NOTE: pDragPanel must be initialized!!
     pDragPanel: SupergridPanel | null = null;
+    pDragNodeView: SupergridNodeView | null = null;
 
     insertMode: string = "top";
 
@@ -140,6 +141,8 @@ export default class SupergridRootView extends Vue {
                 this.resizeNode.data.divider = (evt.clientY - this.resizeNode.rootDiv.offsetTop) / this.resizeNode.rootDiv.offsetHeight;
             }
 
+            this.resizeNode.$forceUpdate();
+
             return;
         }
         //########################## END Resize panels #########################
@@ -236,15 +239,14 @@ export default class SupergridRootView extends Vue {
 
         this.resize = false;
 
-
         //########################### BEGIN Drop drag panel #############################
-
-        //#################### BEGIN Validate the drag & drop action #######################
         if (this.dragPanel == null) {
             return;
         }
 
-        let dragPanel = this.dragPanel; //(<SupergridPanelView>this.dragPanel).data;
+        let dragPanel = this.dragPanel;
+
+        let dragPanelOldParent = dragPanel.parent;
 
         this.dragPanel = null;
 
@@ -253,123 +255,93 @@ export default class SupergridRootView extends Vue {
             return;
         }
 
-        let dropTarget = this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
+        let dropNodeView: SupergridNodeView | null = this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
 
-        if (dropTarget == null) {
-            console.log("No panel!");
+
+        if (dropNodeView == null) {
+            console.log("No drop node!");
             return;
         }
 
-        let newSibling = dropTarget.data;
+        let dropNode = dropNodeView.data;
 
-        if (newSibling == dragPanel) {
+
+
+        if (dragPanel.parent == dropNode && dropNode.childPanels.length == 1) {
             console.log("Drop on self!");
             return;
         }
-        //#################### END Validate the drag & drop action #######################
-
-
-        let grandparent = newSibling.parent;
-
-        //########### BEGIN If newSibling is the root element, add a new root to the hierarchy ###########
-        if (grandparent == null) {
-
-            grandparent = this.data.root;
-            grandparent.divider = 0.5;
-
-            newSibling = new SupergridNode();
-
-            newSibling.dir = grandparent.dir;
-
-            newSibling.children = grandparent.children;
-            // ATTENTION: The order of children array assignments matters here!
-            // FIRST assign grandparent's children to newSibling, THEN
-            // overwrite grandparent's children: 
-            grandparent.children = [newSibling];
-        }
-        //########### END If newSibling is the root element, add a new root to the hierarchy ###########
 
         if (this.insertMode == 'center') {
 
-     
-            if (dropTarget instanceof SupergridNodeView) {
-
-                if (dragPanel.parent == newSibling) {
-                    console.log("drop on self");
-                    return;
-                }
-
-                (<SupergridNode>newSibling).dir = "tabs";
-
-                (<SupergridNode>newSibling).addChild(dragPanel);
-
-                (<SupergridNodeView>dropTarget).data.activeTab = dragPanel;
-
-                dropTarget.$forceUpdate();
-            }
-            else {
-
-                // TODO: 2 This is very similar to cases below. Merge!
-                let newParent = new SupergridNode();
-
-                let si = grandparent.children.indexOf(newSibling);
-                grandparent.children[si] = newParent;
-
-                newParent.addChild(newSibling);
-
-                newParent.dir = "tabs";
-
-                console.log("Drop on tab!");
-                // TODO: 2 This is ugly and brittle
-                newParent.addChild(dragPanel);
-
-                newParent.activeTab = dragPanel;
-
-            }
-
+            dropNode.addChild(dragPanel);
+            dropNode.activeTab = dragPanel;
         }
         else {
+          
+            if (dropNode.parent == null) {
+
+                dropNode = new SupergridNode();
+                dropNode.children = this.data.children;
+
+                for (let child of dropNode.children) {
+                    child.parent = dropNode;
+                }
+
+                this.data.children = [dropNode];
+                dropNode.parent = this.data;
+            }
+
+
+            let grandparent = new SupergridNode();
+
+            let si = dropNode.parent.children.indexOf(dropNode);
+            dropNode.parent.children[si] = grandparent;
+            grandparent.parent = dropNode.parent;
+
+
+            grandparent.addChild(dropNode);
 
             let newParent = new SupergridNode();
 
-            let si = grandparent.children.indexOf(newSibling);
-            grandparent.children[si] = newParent;
+            // TODO: 1 Understand why we need this to avoid layout bugs
+            newParent.parent = grandparent;
 
-            newParent.addChild(newSibling);
+            newParent.addChild(dragPanel);
+
+
 
             switch (this.insertMode) {
 
                 case 'bottom':
-                    newParent.dir = 'col';
-                    newParent.addChild(dragPanel, false);
+                    grandparent.dir = 'col';
+                    grandparent.addChild(newParent, false);
                     break;
 
-
-
                 case 'left':
-                    newParent.dir = 'row';
-                    newParent.addChild(dragPanel, true);
+                    grandparent.dir = 'row';
+                    grandparent.addChild(newParent, true);
                     break;
 
                 case 'right':
-                    newParent.dir = 'row';
-                    newParent.addChild(dragPanel, false);
+                    grandparent.dir = 'row';
+                    grandparent.addChild(newParent, false);
                     break;
 
                 case 'top':
-                    newParent.dir = 'col';
-                    newParent.addChild(dragPanel, true);
+                    grandparent.dir = 'col';
+                    grandparent.addChild(newParent, true);
                     break;
             }
+
+
         }
+
 
         this.data.cleanup();
 
-
-
-        // This is important!:
-        dropTarget.$parent.$forceUpdate();
-
+        // Important!
+        dropNodeView.$parent.$forceUpdate();
         //########################### END Drop drag panel #############################
     }
 }

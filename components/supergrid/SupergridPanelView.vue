@@ -37,6 +37,7 @@ export default class SupergridPanelView extends Vue {
     }
 
     onMouseDown(evt: MouseEvent) {
+        evt.preventDefault();
         (<SupergridNodeView>this.$parent).root.dragPanel = this.data;
     }
 }
