@@ -6,7 +6,7 @@ export class SupergridPanel {
     parent: SupergridNode;
     title: string = "Untitled Panel";
 
-    bgColor: string;
+    isCloseable : boolean = true;
 
     componentName: string;
     componentProps : any = {};

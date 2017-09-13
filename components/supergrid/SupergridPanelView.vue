@@ -1,11 +1,10 @@
 <template>
     <div ref="rootDiv" class="vuety-supergrid-panel">
         <h1 class="header" @mousedown="onMouseDown"> {{data.title}}
-            <span class="closeButton" @mousedown="onCloseButtonClick">X</span>
+            <span v-if="data.isCloseable" class="closeButton" @mousedown="onCloseButtonClick">X</span>
         </h1>
         <div class="content">            
             <component :is="data.componentName" v-bind="data.componentProps" />   
-            <!--{{data.componentProps}}         -->
         </div>
     </div>
 </template>
