@@ -6,8 +6,8 @@
 
             <ul role="tablist">
                 <li v-for="(panel, index) in data.childPanels">
-                    <span class="handle" @mousedown="onTabMouseDown($event, panel)">|||</span>
-                    <span class="title" @click="onTabClick($event, panel)">{{panel.title}}</span>
+
+                    <span class="title" @mousedown="onTabMouseDown($event, panel)">{{panel.title}}</span>
                     <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)">X</span>
                 </li>
             </ul>
@@ -21,11 +21,11 @@
         <!--#################### END Stacked (tabs) view #########################-->
 
         <!--#################### BEGIN "normal" view #########################-->
-        <template v-else>
-            <template v-for="(child, index) of data.children">
-                <component :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />
-            </template>
+
+        <template v-else v-for="(child, index) of data.children">
+            <component :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />
         </template>
+
         <!--#################### END "normal" view #########################-->
 
     </div>
@@ -162,7 +162,7 @@ export default class SupergridNodeView extends Vue {
                         return bla;
                     }
                 }
-                
+
             }
         }
         //################### END Recursive search for panel under mouse ###################
@@ -185,10 +185,6 @@ export default class SupergridNodeView extends Vue {
         return dir1 + ": " + size + "%;" + dir2 + ": 100%";
     }
 
-    onTabClick(evt: MouseEvent, panel: SupergridPanel) {
-        //(<SupergridNodeView>this.$parent).root.dragPanel = panel;
-        this.data.activeTab = panel;
-    }
 
 
     onTabCloseClick(evt: MouseEvent, panel: SupergridPanel) {
@@ -199,10 +195,13 @@ export default class SupergridNodeView extends Vue {
         this.data.removeChild(panel);
     }
 
-    onTabMouseDown(evt: MouseEvent, panel: SupergridPanel | null) {
+    onTabMouseDown(evt: MouseEvent, panel: SupergridPanel) {
         evt.preventDefault();
-        this.root.dragPanel = panel;
-        this.root.pDragNodeView = this;
+
+
+        this.data.activeTab = panel;
+
+        this.root.setDragPanel(evt, panel);
     }
 
     tabInlineStyle(panel: SupergridPanel): string {

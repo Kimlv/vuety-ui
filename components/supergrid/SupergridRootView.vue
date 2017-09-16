@@ -33,17 +33,22 @@ export default class SupergridRootView extends Vue {
 
     // NOTE: pDragPanel must be initialized!!
     pDragPanel: SupergridPanel | null = null;
-    pDragNodeView: SupergridNodeView | null = null;
+
 
     insertMode: string = "top";
 
     dragOffsetX: number = 0;
     dragOffsetY: number = 0;
 
+    fooX: number = 0;
+    fooY: number = 0;
+    fooPanel: SupergridPanel | null = null;
+
     resize: boolean = false;
     resizeNode: SupergridNodeView | null = null;
 
     dropBorderWidth: number = 0.25;
+    panelDragDistTolerance : number = 20;
     //################# END Misc properties ###################
 
 
@@ -106,28 +111,24 @@ export default class SupergridRootView extends Vue {
 
     onMouseDown(evt: MouseEvent) {
 
-
-
         if (this.resizeNode != null) {
             evt.preventDefault();
             this.resize = true;
         }
-
-        if (this.dragPanel != null) {
-            evt.preventDefault();
-
-            if (this.resizeNode == null) {
-                /*
-                                let div = this.dragPanel.rootDiv;
-                
-                                this.dragOffsetX = evt.clientX - div.offsetLeft;
-                                this.dragOffsetY = evt.clientY - div.offsetTop;
-                                */
-            }
-        }
     }
 
     onMouseMove(evt: MouseEvent) {
+
+        //################ BEGIN Tab @mousedown prevent drag start tolerance ##############
+        let a = Math.abs(this.fooX - evt.offsetX);
+        let b = Math.abs(this.fooY - evt.offsetY);
+
+        if (Math.sqrt(a * a + b * b) > this.panelDragDistTolerance && this.fooPanel != null) {
+            console.log("Start drag");
+            this.dragPanel = this.fooPanel;
+            this.fooPanel = null;
+        }
+        //################ END Tab @mousedown prevent drag start tolerance ##############
 
         //########################## BEGIN Resize panels #########################
         if (this.resize && this.resizeNode != null) {
@@ -152,6 +153,9 @@ export default class SupergridRootView extends Vue {
 
         // ATTENTION: getPanelUnder() must be called HERE to show the resize cursor!!!
         let panelUnderMouse = <SupergridNodeView | null>this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
+
+
+
 
 
         if (this.dragPanel == null) {
@@ -237,6 +241,7 @@ export default class SupergridRootView extends Vue {
     onMouseUp(evt: MouseEvent) {
 
         this.resize = false;
+        this.fooPanel = null;
 
         //########################### BEGIN Drop drag panel #############################
         if (this.dragPanel == null) {
@@ -244,10 +249,11 @@ export default class SupergridRootView extends Vue {
         }
 
         let dragPanel = this.dragPanel;
+        this.dragPanel = null;
 
         let dragPanelOldParent = dragPanel.parent;
 
-        this.dragPanel = null;
+
 
         if (['bottom', 'center', 'left', 'right', 'top'].indexOf(this.insertMode) < 0) {
             console.log("Invalid insert mode: " + this.insertMode);
@@ -352,6 +358,13 @@ export default class SupergridRootView extends Vue {
         //########################### END Drop drag panel #############################
 
 
+    }
+
+    setDragPanel(evt: MouseEvent, panel: SupergridPanel | null) {
+        this.dragPanel = null;
+        this.fooX = evt.offsetX;
+        this.fooY = evt.offsetY;
+        this.fooPanel = panel;
     }
 }
 </script>
