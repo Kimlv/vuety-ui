@@ -381,6 +381,7 @@ div.vuety-supergrid-root {
         display: none;
         position: fixed;
         cursor: move;
+        z-index:99;
     }
 }
 </style>

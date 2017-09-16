@@ -5,10 +5,12 @@
         <div class="tabs" v-if="data.childPanels.length > 0">
 
             <ul role="tablist">
-                <li v-for="(panel, index) in data.childPanels">
+                <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)">
 
-                    <span class="title" @mousedown="onTabMouseDown($event, panel)">{{panel.title}}</span>
-                    <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)">X</span>
+                    <span @mousedown="onTabMouseDown($event, panel)">{{panel.title}}</span>
+                    <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)">
+
+                    </span>
                 </li>
             </ul>
 
@@ -91,6 +93,14 @@ export default class SupergridNodeView extends Vue {
         return "";
     }
 
+
+    getPanelCssClass(panel: SupergridPanel) {
+        if (panel == this.data.activeTab) {
+            return "active";
+        }
+
+        return "";
+    }
 
     getPanelUnder(x: number, y: number): SupergridNodeView | null {
 
@@ -188,9 +198,7 @@ export default class SupergridNodeView extends Vue {
 
 
     onTabCloseClick(evt: MouseEvent, panel: SupergridPanel) {
-
-        evt.stopPropagation();
-        evt.stopImmediatePropagation();
+        evt.preventDefault();
 
         this.data.removeChild(panel);
     }
@@ -198,9 +206,7 @@ export default class SupergridNodeView extends Vue {
     onTabMouseDown(evt: MouseEvent, panel: SupergridPanel) {
         evt.preventDefault();
 
-
         this.data.activeTab = panel;
-
         this.root.setDragPanel(evt, panel);
     }
 
@@ -221,6 +227,7 @@ div.vuety-supergrid-node {
     display: flex;
     flex: 1; // Important!
     flex-basis: auto; // Important!
+
     &.col {
         flex-direction: column;
     }
@@ -230,32 +237,63 @@ div.vuety-supergrid-node {
     }
 
     >div.tabs {
-        border: 1px solid #aaa;
+        border: 1px solid #bbb;
+        
+        
 
         display: flex;
         flex-direction: column;
         width: 100%;
         height: 100%;
 
-        span.handle {
-            cursor: move;
-        }
 
-        >div.tab {
+        >.tab {
             overflow: auto;
+            background-color: #fff;
+            z-index: 3;
         }
 
         >ul {
+            background-color: #88f;
             list-style: none;
             margin: 0;
-            padding: 0;
-
+            padding: 0; //border-bottom:4px solid #66c;
             >li {
+                background-color: #f0f0f0;
+                border-radius: 5px 5px 0 0;
+                
                 display: inline-block;
-                padding: 4px;
+                font-size: 1.2em;
+                margin: 2px 2px 0px 0px;
+                padding: 6px 8px;
+                position: relative;
+                top: 4px;
+                z-index: 1;
+
+
+                &.active {
+                    background-color: #fff;
+                    color: #000; //border-bottom: 4px solid #fff;
+                    cursor: move !important;
+                    top: 0px;
+                    padding-bottom: 10px;
+                    box-shadow: 0px 0px 6px rgba(0, 0, 0,0.7);
+                    z-index:2;
+                }
 
                 &:hover {
-                    background-color: #ccc;
+                    //   background-color: #bbb;
+                    cursor: pointer;
+                }
+
+                .close {
+                    background-image: url("./close.svg");
+                    background-size: 100% 100%;
+                    width: 16px;
+                    height: 16px;
+                    display: inline-block;
+                    margin-bottom: 0px;
+                    margin-left: 2px;
                 }
             }
         }

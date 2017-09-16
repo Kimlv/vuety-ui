@@ -1,14 +1,12 @@
 <template>
     <div class="vuety-datagrid">
 
-        <div class="DataGrid-table-wrapper">
+        <div class="datagrid-table-wrapper">
             <!-- NOTE: 'tabindex="0" is required to listen for key events on a table element' -->
             <table ref="table" @wheel="onWheel" @keydown="onKeyDown" tabindex="0">
-                <!-- Print headers: -->
 
-                <tr>
-                    <th @click="setOrder(column.field)" v-for="(column, colIndex) in columns">{{column.title}}</th>
-                </tr>
+                <!-- Print headers: -->
+                <tr><th @click="setOrder(column.field)" v-for="(column, colIndex) in columns">{{column.title}}</th></tr>
 
                 <!-- ############################ BEGIN Print data rows ############################## -->
                 <!-- ATTENTION: rowIndex starts at 1 !!! -->
@@ -27,8 +25,7 @@
             </table>
         </div>
 
-
-        <Scrollbar v-if="displayedContent.length > numDisplayedRows" @my-scroll="onMyScroll" ref="scrollbar" />
+        <Scrollbar ref="scrollbar" v-if="displayedContent.length > numDisplayedRows" @my-scroll="onMyScroll" />
     </div>
 </template>
 
@@ -189,6 +186,7 @@ export default class DataGrid extends Vue {
     //################# END selectedCol property logic ###################
 
     mounted() {
+        
         // ATTENTION: This is required to get the correct table height on initial rendering:
         this.$forceUpdate();
     }
@@ -307,18 +305,22 @@ export default class DataGrid extends Vue {
 
 <style lang="scss">
 div.vuety-datagrid {
-    display: flex;
+    display: flex !important;
+    flex-direction: row !important;
+    
     // TODO: 1 Fix wrong scollbar position in drag&drop layout
 
     /* 
     NOTE: The construct of wrapping the table in a <div> wrapper, giving the div wrapper 'flex:1'
     and the table 'width:100%' is required for collect calculation of the horizontal scrollbar position.
     */
-    div.DataGrid-table-wrapper {
-        flex: 1;
+    > div.datagrid-table-wrapper {
+        
+       flex:1;
 
         //################## BEGIN Table ###################
         table {
+            
             border-collapse: collapse;
             width: 100%;
 
