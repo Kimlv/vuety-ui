@@ -1,31 +1,35 @@
 <template>
     <div class="vuety-datagrid">
+        <div>
 
-        <div class="datagrid-table-wrapper">
-            <!-- NOTE: 'tabindex="0" is required to listen for key events on a table element' -->
-            <table ref="table" @wheel="onWheel" @keydown="onKeyDown" tabindex="0">
+            <div class="datagrid-table-wrapper">
+                <!-- NOTE: 'tabindex="0" is required to listen for key events on a table element' -->
+                <table ref="table" @wheel="onWheel" @keydown="onKeyDown" tabindex="0">
 
-                <!-- Print headers: -->
-                <tr><th @click="setOrder(column.field)" v-for="(column, colIndex) in columns">{{column.title}}</th></tr>
+                    <!-- Print headers: -->
+                    <tr>
+                        <th @click="setOrder(column.field)" v-for="(column, colIndex) in columns">{{column.title}}</th>
+                    </tr>
 
-                <!-- ############################ BEGIN Print data rows ############################## -->
-                <!-- ATTENTION: rowIndex starts at 1 !!! -->
-                <tr v-for="rowIndex in numDisplayedRows" :class="rowIndex + scrollRow - 1 == pSelectedRow ? 'selected' : ''">
-                    <td v-for="(column, colIndex) in columns" :class="(rowIndex + scrollRow - 1 == pSelectedRow) && (colIndex == pSelectedCol) ? 'selected' : ''">
+                    <!-- ############################ BEGIN Print data rows ############################## -->
+                    <!-- ATTENTION: rowIndex starts at 1 !!! -->
+                    <tr v-for="rowIndex in numDisplayedRows" :class="rowIndex + scrollRow - 1 == pSelectedRow ? 'selected' : ''">
+                        <td v-for="(column, colIndex) in columns" :class="(rowIndex + scrollRow - 1 == pSelectedRow) && (colIndex == pSelectedCol) ? 'selected' : ''">
 
-                        <div v-if="rowIndex + scrollRow - 1 == pSelectedRow && colIndex == pSelectedCol && editMode" class="edit">
-                            <input ref="editField" @blur="editMode = false" v-on:keyup.esc="editMode = false" v-model="editValue" type="text" size="4" />
-                        </div>
-                        <div v-else @click="onCellClicked(rowIndex + scrollRow - 1,colIndex)">
-                            {{displayedContent[rowIndex + scrollRow - 1][column.field]}}
-                        </div>
-                    </td>
-                </tr>
-                <!-- ############################## END Print data rows ############################### -->
-            </table>
+                            <div v-if="rowIndex + scrollRow - 1 == pSelectedRow && colIndex == pSelectedCol && editMode" class="edit">
+                                <input ref="editField" @blur="editMode = false" v-on:keyup.esc="editMode = false" v-model="editValue" type="text" size="4" />
+                            </div>
+                            <div v-else @click="onCellClicked(rowIndex + scrollRow - 1,colIndex)">
+                                {{displayedContent[rowIndex + scrollRow - 1][column.field]}}
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- ############################## END Print data rows ############################### -->
+                </table>
+            </div>
+
+            <Scrollbar ref="scrollbar" v-if="displayedContent.length > numDisplayedRows" @my-scroll="onMyScroll" />
         </div>
-
-        <Scrollbar ref="scrollbar" v-if="displayedContent.length > numDisplayedRows" @my-scroll="onMyScroll" />
     </div>
 </template>
 
@@ -33,7 +37,7 @@
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 import Scrollbar from './Scrollbar.vue'
 
-@Component({    
+@Component({
     components: {
         Scrollbar
     }
@@ -186,7 +190,7 @@ export default class DataGrid extends Vue {
     //################# END selectedCol property logic ###################
 
     mounted() {
-        
+
         // ATTENTION: This is required to get the correct table height on initial rendering:
         this.$forceUpdate();
     }
@@ -294,10 +298,10 @@ export default class DataGrid extends Vue {
         if (this.displayedContent.length > this.numDisplayedRows) {
             let scrollbar = <Scrollbar>this.$refs.scrollbar;
             scrollbar.setHeight(th + 'px');
-            
+
         }
 
-        
+
         //########## END Synchronize scrollbar height with table height ############
     }
 }
@@ -305,85 +309,84 @@ export default class DataGrid extends Vue {
 
 <style lang="scss">
 div.vuety-datagrid {
-    display: flex !important;
-    flex-direction: row !important;
-    
-    // TODO: 1 Fix wrong scollbar position in drag&drop layout
 
-    /* 
-    NOTE: The construct of wrapping the table in a <div> wrapper, giving the div wrapper 'flex:1'
-    and the table 'width:100%' is required for collect calculation of the horizontal scrollbar position.
-    */
-    > div.datagrid-table-wrapper {
+    >div {
+        display: flex;
+        flex-direction: row;
+
+        /* 
+        NOTE: The construct of wrapping the table in a <div> wrapper, giving the div wrapper 'flex:1'
+        and the table 'width:100%' is required for collect calculation of the horizontal scrollbar position.
+        */
         
-       flex:1;
+        >div.datagrid-table-wrapper {
 
-        //################## BEGIN Table ###################
-        table {
-            
-            border-collapse: collapse;
-            width: 100%;
+            flex: 1; //################## BEGIN Table ###################
+            table {
 
-            /* ATTENTION: 'table-layout:fixed' is required for 'overflow-hiddden' on table cells! */
-            table-layout: fixed;
+                border-collapse: collapse;
+                width: 100%;
 
-            td,
-            th {
-                border: 1px solid #000;
-                white-space: nowrap;
-            }
+                /* ATTENTION: 'table-layout:fixed' is required for 'overflow-hiddden' on table cells! */
+                table-layout: fixed;
 
-            th {
-                background-color: #88c;
-                color: #fff;
-                padding: 4px;
-            }
-
-            td,
-            th,
-            input[type=text] {
-                font-size: 1em;
-                font-family: sans-serif;
-            }
-
-            td {
-                padding: 0;
-                margin: 0;
-
-                div {
-                    padding: 4px;
-                    overflow: hidden;
+                td,
+                th {
+                    border: 1px solid #000;
                     white-space: nowrap;
                 }
 
-                div.edit {
-
-                    background-color: #bbf;
-                    border: 2px solid #222;
-                    padding: 2px;
+                th {
+                    background-color: #88c;
+                    color: #fff;
+                    padding: 4px;
                 }
 
-
+                td,
+                th,
                 input[type=text] {
-                    background-color: transparent;
-
-                    outline-width: 0;
-                    margin: 0;
-                    padding: 0;
-                    border: none;
-                    width: 100%;
+                    font-size: 1em;
+                    font-family: sans-serif;
                 }
-            }
 
-            td.selected {
-                background-color: #bbf;
-            }
+                td {
+                    padding: 0;
+                    margin: 0;
 
-            tr.selected {
-                background-color: #dd4;
-            }
+                    div {
+                        padding: 4px;
+                        overflow: hidden;
+                        white-space: nowrap;
+                    }
+
+                    div.edit {
+
+                        background-color: #bbf;
+                        border: 2px solid #222;
+                        padding: 2px;
+                    }
+
+
+                    input[type=text] {
+                        background-color: transparent;
+
+                        outline-width: 0;
+                        margin: 0;
+                        padding: 0;
+                        border: none;
+                        width: 100%;
+                    }
+                }
+
+                td.selected {
+                    background-color: #bbf;
+                }
+
+                tr.selected {
+                    background-color: #dd4;
+                }
+            } //################## END Table ###################
         }
-        //################## END Table ###################
     }
 }
 </style>
