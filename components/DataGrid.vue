@@ -308,6 +308,7 @@ export default class DataGrid extends Vue {
 <style lang="scss">
 div.vuety-datagrid {
     display: flex;
+    // TODO: 1 Fix wrong scollbar position in drag&drop layout
 
     /* 
     NOTE: The construct of wrapping the table in a <div> wrapper, giving the div wrapper 'flex:1'
