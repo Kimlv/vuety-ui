@@ -227,6 +227,7 @@ div.vuety-supergrid-node {
     display: flex;
     flex: 1; // Important!
     flex-basis: auto; // Important!
+    min-height:0; // ATTENTION: 'min-height:0' is required for "overflow:auto/scroll" on child elements to work in Firefox!!!
 
     &.col {
         flex-direction: column;
@@ -238,14 +239,11 @@ div.vuety-supergrid-node {
 
     >div.tabs {
         border: 1px solid #bbb;
-        
-        
-
+            
         display: flex;
-        flex-direction: column;
-        width: 100%;
+        flex-direction: column;        
         height: 100%;
-
+        width: 100%;
 
         >.tab {
             overflow: auto;
@@ -257,7 +255,8 @@ div.vuety-supergrid-node {
             background-color: #88f;
             list-style: none;
             margin: 0;
-            padding: 0; //border-bottom:4px solid #66c;
+            padding: 0;
+            
             >li {
                 background-color: #f0f0f0;
                 border-radius: 5px 5px 0 0;
@@ -270,10 +269,9 @@ div.vuety-supergrid-node {
                 top: 4px;
                 z-index: 1;
 
-
                 &.active {
                     background-color: #fff;
-                    color: #000; //border-bottom: 4px solid #fff;
+                    color: #000; 
                     cursor: move !important;
                     top: 0px;
                     padding-bottom: 10px;
@@ -282,7 +280,6 @@ div.vuety-supergrid-node {
                 }
 
                 &:hover {
-                    //   background-color: #bbb;
                     cursor: pointer;
                 }
 

@@ -22,22 +22,23 @@ export default class LinearLayout extends Vue {
 <style lang="scss">
 div.vuety-linear-layout {
 
+    min-height:0; // ATTENTION: min-height:0 is required for "overflow:auto/scroll" on child elements to work in Firefox!!!
+    align-items: stretch;
     display: flex;
-
-    &.row {
-        flex-direction: row;
-        align-items: stretch;
-        height: 100%;
-    }
+    flex: 1; // Important!
+    flex-basis: auto; // Important!
+    height: 100%;
 
     &.col {
         flex-direction: column;
     }
 
-    >* {        
-        // 'width:100%'' is SUPER IMPORTANT here to ensure correct rendering in Firefox!!!
-        width: 100%;  
-        
+    &.row {
+        flex-direction: row;        
     }
+
+    >* {
+        flex: 1;
+    }    
 }
 </style>

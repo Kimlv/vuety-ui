@@ -23,7 +23,7 @@ export default class Drawer extends Vue {
 
     peek: boolean = false;
     pHidden: boolean = false;
-    
+
     peekAutoCloseDelay_ms: number = 1000;
 
     private hideTimerHandle: any;
@@ -83,10 +83,9 @@ div.vuety-drawer {
     position: absolute;
 
     background-color: #f0f0f0; // Drawer default width:
-    width: 250px; // ATTENTION: 'height:100%' is required to keep the 100% height with absolute positioning (peek mode):
-    height: 100%; // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
-    z-index: 99;
-
+    width: 250px;
+    height: 100%; // ATTENTION: 'height:100%' is required to keep the 100% height with absolute positioning (peek mode):
+    z-index: 99; // NOTE: For Internet Explorer, z-index must be defined here, not in the parent DIV!
     >button {
         margin: 8px;
     }
