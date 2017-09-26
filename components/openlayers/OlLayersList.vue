@@ -15,6 +15,11 @@
                     <br />
 
                     <input type="button" value="Fit Extent" @click="onButtonFitExtentClick(layer, $event)" />
+
+<!--
+                    <vt-ol-abstract-layer-control :layer="layer"/>
+-->
+                    <component :is="getLayerControlComponentType(layer)" :layer="layer" />
                 </div>
 
             </li>
@@ -25,10 +30,15 @@
 <script lang="ts">
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 
-//import * as eb from './OlEventBus'
 
-// Import OpenLayers code and CSS:
+// Import OpenLayers code:
 import * as ol from 'openlayers'
+
+import OlAbstractLayerControl from './layerControls/OlAbstractLayerControl.vue'
+import WMSLayerSeriesAnimationLayerControl from './layerControls/WMSLayerSeriesAnimationLayerControl.vue'
+
+Vue.component('vt-ol-abstract-layer-control', OlAbstractLayerControl);
+Vue.component('vt-ol-wms-layer-series-animation-layer-control', WMSLayerSeriesAnimationLayerControl);
 
 @Component({})
 export default class OlLayersList extends Vue {
@@ -54,6 +64,11 @@ export default class OlLayersList extends Vue {
 
     }
 
+
+    getLayerControlComponentType(layer : ol.layer.Base) : string {
+        return "vt-ol-wms-layer-series-animation-layer-control";
+        //return "vt-ol-abstract-layer-control";
+    }
 
 
     onCheckboxClick(layer: ol.layer.Base, evt: MouseEvent) {
