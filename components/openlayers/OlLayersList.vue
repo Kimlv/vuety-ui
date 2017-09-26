@@ -3,10 +3,20 @@
 
         <ul v-for="layer of getLayers()">
             <li>
-                {{layer.get('title')}} 
-                <input type="checkbox" :checked="layer.getVisible()" @click="onCheckboxClick(layer, $event)" />
-                <br />
-                <input type="button" value="Fit Extent" @click="onButtonFitExtentClick(layer, $event)"/>
+                <h3>{{layer.get('title')}}</h3>
+                <div class="layerSettings">
+                    <!--
+                    Sichtbar <input type="checkbox" :checked="layer.getVisible()" @click="onCheckboxClick(layer, $event)" />
+                    <br/>
+                    -->
+
+                    Sichtbarkeit 
+                    <input type="range" min="0" max="1" step="0.01" value="layer.getOpacity()" @input="onLayerOpacitySliderInput(layer, $event)" />
+                    <br />
+
+                    <input type="button" value="Fit Extent" @click="onButtonFitExtentClick(layer, $event)" />
+                </div>
+
             </li>
         </ul>
     </div>
@@ -47,25 +57,60 @@ export default class OlLayersList extends Vue {
 
 
     onCheckboxClick(layer: ol.layer.Base, evt: MouseEvent) {
-       
+
         let val = !layer.getVisible();
         layer.setVisible(val);
     }
 
     onButtonFitExtentClick(layer: ol.layer.Base, evt: MouseEvent) {
-       
+
         try {
             this.map.getView().fit(layer.getExtent());
         }
-        catch(e) {
-            
+        catch (e) {
+
         }
+    }
+
+    onLayerOpacitySliderInput(layer: ol.layer.Base, evt: MouseEvent) {
+        let elem = <HTMLInputElement> evt.target;
+
+        let val = parseFloat(elem.value);
+
+        if (val == 0) {
+            layer.setVisible(false);
+        }
+        else {
+            layer.setVisible(true);
+            layer.setOpacity(val);
+        }
+
+        
     }
 }
 </script>
 
 <style lang="scss">
-div.vuety-ol-map-layers-list {
-    
+div.vuety-ol-layers-list {
+
+    > ul {
+        margin:0;
+        padding:0;
+
+        > li {
+            list-style: none;
+
+            > div {
+                padding:8px;
+            }
+
+            > h3 {
+                background-color:#ccc;
+                font-weight:normal;
+                margin:0;
+                padding:8px;
+            }
+        }
+    }
 }
 </style>
