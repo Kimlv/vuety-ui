@@ -5,7 +5,8 @@
             <li>
                 {{layer.get('title')}} 
                 <input type="checkbox" :checked="layer.getVisible()" @click="onCheckboxClick(layer, $event)" />
-
+                <br />
+                <input type="button" value="Fit Extent" @click="onButtonFitExtentClick(layer, $event)"/>
             </li>
         </ul>
     </div>
@@ -49,6 +50,16 @@ export default class OlLayersList extends Vue {
        
         let val = !layer.getVisible();
         layer.setVisible(val);
+    }
+
+    onButtonFitExtentClick(layer: ol.layer.Base, evt: MouseEvent) {
+       
+        try {
+            this.map.getView().fit(layer.getExtent());
+        }
+        catch(e) {
+            
+        }
     }
 }
 </script>
