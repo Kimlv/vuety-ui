@@ -263,10 +263,10 @@ div.vuety-supergrid-node {
                 
                 display: inline-block;
                 font-size: 1.2em;
-                margin: 2px 2px 0px 0px;
+                margin: 0px 2px 0px 0px;
                 padding: 6px 8px;
                 position: relative;
-                top: 4px;
+                top: 5px;
                 z-index: 1;
 
                 &.active {
@@ -274,7 +274,7 @@ div.vuety-supergrid-node {
                     color: #000; 
                     cursor: move !important;
                     top: 0px;
-                    padding-bottom: 10px;
+                    padding-bottom: 11px;
                     box-shadow: 0px 0px 6px rgba(0, 0, 0,0.7);
                     z-index:2;
                 }
