@@ -1,27 +1,22 @@
 <template>
     <div class="vuety-ol-layers-list">
-
         <ul v-for="layer of getLayers()">
             <li>
                 <h3>{{layer.get('title')}}</h3>
                 <div class="layerSettings">
                     <!--
-                    Sichtbar <input type="checkbox" :checked="layer.getVisible()" @click="onCheckboxClick(layer, $event)" />
-                    <br/>
-                    -->
+                        Sichtbar <input type="checkbox" :checked="layer.getVisible()" @click="onCheckboxClick(layer, $event)" />
+                        <br/>
+                        -->
 
-                    Sichtbarkeit 
+                    Sichtbarkeit
                     <input type="range" min="0" max="1" step="0.01" :value="layer.getOpacity()" @input="onLayerOpacitySliderInput(layer, $event)" />
                     <br />
 
                     <input type="button" value="Fit Extent" @click="onButtonFitExtentClick(layer, $event)" />
 
-<!--
-                    <vt-ol-abstract-layer-control :layer="layer"/>
--->
                     <component :is="getLayerControlComponentType(layer)" :layer="layer" />
                 </div>
-
             </li>
         </ul>
     </div>
@@ -49,6 +44,11 @@ export default class OlLayersList extends Vue {
     //###### END Props #######
 
 
+    created() {        
+
+    }
+
+
     getLayers(): ol.layer.Base[] {
 
         if (this.map != null) {
@@ -59,13 +59,7 @@ export default class OlLayersList extends Vue {
 
     }
 
-    created() {
-        let layer = new ol.layer.Base({});
-
-    }
-
-
-    getLayerControlComponentType(layer : ol.layer.Base) : string {
+    getLayerControlComponentType(layer: ol.layer.Base): string {
         return "vt-ol-wms-layer-series-animation-layer-control";
         //return "vt-ol-abstract-layer-control";
     }
@@ -88,7 +82,7 @@ export default class OlLayersList extends Vue {
     }
 
     onLayerOpacitySliderInput(layer: ol.layer.Base, evt: MouseEvent) {
-        let elem = <HTMLInputElement> evt.target;
+        let elem = <HTMLInputElement>evt.target;
 
         let val = parseFloat(elem.value);
 
@@ -99,8 +93,6 @@ export default class OlLayersList extends Vue {
             layer.setVisible(true);
             layer.setOpacity(val);
         }
-
-        
     }
 }
 </script>
@@ -108,22 +100,22 @@ export default class OlLayersList extends Vue {
 <style lang="scss">
 div.vuety-ol-layers-list {
 
-    > ul {
-        margin:0;
-        padding:0;
+    >ul {
+        margin: 0;
+        padding: 0;
 
-        > li {
+        >li {
             list-style: none;
 
-            > div {
-                padding:8px;
+            >div {
+                padding: 8px;
             }
 
-            > h3 {
-                background-color:#ccc;
-                font-weight:normal;
-                margin:0;
-                padding:8px;
+            >h3 {
+                background-color: #ccc;
+                font-weight: normal;
+                margin: 0;
+                padding: 8px;
             }
         }
     }

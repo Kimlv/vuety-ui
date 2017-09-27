@@ -3,7 +3,7 @@
 
        WMS animation layer control!
        {{layer.animationSpeed}}
-       <input type="range" v-model.number="layer.animationSpeed" min="0" max="15"/>
+       <input type="range" v-model.number="layer.animationSpeed" min="-15" max="15"/>
     </div>
 </template>
 
