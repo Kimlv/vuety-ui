@@ -45,8 +45,8 @@ export default class OlLayersList extends Vue {
 
     getLayerControlComponentType(layer: ol.layer.Base): string {
         // TODO: 2 Make this dynamic
-        return "vt-ol-wms-layer-series-animation-layer-control";
-        //return "vt-ol-abstract-layer-control";
+        return "olala-wms-layer-series-animation-layer-control";
+        
     }
 
 
