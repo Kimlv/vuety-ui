@@ -154,10 +154,6 @@ export default class SupergridRootView extends Vue {
         // ATTENTION: getPanelUnder() must be called HERE to show the resize cursor!!!
         let panelUnderMouse = <SupergridNodeView | null>this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
 
-
-
-
-
         if (this.dragPanel == null) {
             return;
         }

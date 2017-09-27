@@ -2,6 +2,8 @@
     <div ref="rootDiv" :class="'vuety-supergrid-node ' + data.dir">
 
         <!--#################### BEGIN Stacked (tabs) view #########################-->
+
+        <!-- NOTE: Whenever a node has panel children, the node will be displayed as tabbed child panels. -->
         <div class="tabs" v-if="data.childPanels.length > 0">
 
             <ul role="tablist">
@@ -18,17 +20,16 @@
             <template v-for="(panel, index) of data.childPanels">
                 <component :is="panel.componentName" v-bind="panel.componentProps" class="tab" :style="tabInlineStyle(panel)" />
             </template>
-
         </div>
         <!--#################### END Stacked (tabs) view #########################-->
 
-        <!--#################### BEGIN "normal" view #########################-->
 
+        <!--#################### BEGIN subdivision view #########################-->
+        <!-- ATTENTION: The 'v-for' must really be in the template! -->
         <template v-else v-for="(child, index) of data.children">
             <component :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />
         </template>
-
-        <!--#################### END "normal" view #########################-->
+        <!--#################### END subdivision view #########################-->
 
     </div>
 </template>
