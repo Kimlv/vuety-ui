@@ -4,12 +4,8 @@
             <li>
                 <h3>{{layer.get('title')}}</h3>
                 <div class="layerSettings">
-                    <!--
-                        Sichtbar <input type="checkbox" :checked="layer.getVisible()" @click="onCheckboxClick(layer, $event)" />
-                        <br/>
-                        -->
-
-                    Sichtbarkeit
+                   
+                    Sichtbarkeit:
                     <input type="range" min="0" max="1" step="0.01" :value="layer.getOpacity()" @input="onLayerOpacitySliderInput(layer, $event)" />
                     <br />
 
@@ -29,12 +25,6 @@ import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorat
 // Import OpenLayers code:
 import * as ol from 'openlayers'
 
-import OlAbstractLayerControl from './layerControls/OlAbstractLayerControl.vue'
-import WMSLayerSeriesAnimationLayerControl from './layerControls/WMSLayerSeriesAnimationLayerControl.vue'
-
-Vue.component('vt-ol-abstract-layer-control', OlAbstractLayerControl);
-Vue.component('vt-ol-wms-layer-series-animation-layer-control', WMSLayerSeriesAnimationLayerControl);
-
 @Component({})
 export default class OlLayersList extends Vue {
 
@@ -42,12 +32,6 @@ export default class OlLayersList extends Vue {
     @Prop()
     map: ol.Map;
     //###### END Props #######
-
-
-    created() {        
-
-    }
-
 
     getLayers(): ol.layer.Base[] {
 
@@ -60,6 +44,7 @@ export default class OlLayersList extends Vue {
     }
 
     getLayerControlComponentType(layer: ol.layer.Base): string {
+        // TODO: 2 Make this dynamic
         return "vt-ol-wms-layer-series-animation-layer-control";
         //return "vt-ol-abstract-layer-control";
     }
