@@ -1,9 +1,8 @@
 <template>
     <div class="vuety-ol-layer-control">
 
-       WMS animation layer control!
-       {{layer.animationSpeed}}
-       <input type="range" v-model.number="layer.animationSpeed" min="-15" max="15"/>
+       Abspielgeschwindigkeit:<br/>
+       <input type="range" v-model.number="layer.animationSpeed" min="-12" max="12"/> {{layer.speedUpFactor}} x
     </div>
 </template>
 
