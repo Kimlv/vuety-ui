@@ -4,7 +4,7 @@
             <li>
                 <h3>{{layer.get('title')}}</h3>
                 <div class="layerSettings">
-                   
+
                     Sichtbarkeit:
                     <input type="range" min="0" max="1" step="0.01" :value="layer.getOpacity()" @input="onLayerOpacitySliderInput(layer, $event)" />
                     <br />
@@ -45,8 +45,11 @@ export default class OlLayersList extends Vue {
 
     getLayerControlComponentType(layer: ol.layer.Base): string {
         // TODO: 2 Make this dynamic
-        return "olala-wms-layer-series-animation-layer-control";
-        
+
+        let l = <any>layer;
+        return l.controlComp;
+        //  return "olala-wms-layer-series-animation-layer-control";
+
     }
 
 
