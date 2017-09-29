@@ -9,8 +9,6 @@
                     <input type="range" min="0" max="1" step="0.01" :value="layer.getOpacity()" @input="onLayerOpacitySliderInput(layer, $event)" />
                     <br />
 
-                    <input type="button" value="Fit Extent" @click="onButtonFitExtentClick(layer, $event)" />
-
                     <component :is="getLayerControlComponentType(layer)" :layer="layer" />
                 </div>
             </li>
