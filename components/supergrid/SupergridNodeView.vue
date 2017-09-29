@@ -7,20 +7,18 @@
         <div class="tabs" v-if="data.childPanels.length > 0">
 
             <ul role="tablist">
-                <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)">
-
+                <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)" :style="getTabInlineStyle(panel)">
                     <span @mousedown="onTabMouseDown($event, panel)">
-                        <img v-if="panel.iconUrl != ''" :src="panel.iconUrl" style="height:1.2em;margin-right:0.3em;vertical-align:bottom" />{{panel.title}}
-                    </span>
-                    <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)">
 
+                        <span>{{panel.title}}</span>
                     </span>
+                    <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)"></span>
                 </li>
             </ul>
 
             <!-- Here go the tabs: -->
             <template v-for="(panel, index) of data.childPanels">
-                <component :is="panel.componentName" v-bind="panel.componentProps" class="tab" :style="tabInlineStyle(panel)" />
+                <component :is="panel.componentName" v-bind="panel.componentProps" class="tab" :style="getPanelInlineStyle(panel)" />
             </template>
         </div>
         <!--#################### END Stacked (tabs) view #########################-->
@@ -28,7 +26,7 @@
         <!--#################### BEGIN subdivision view #########################-->
         <!-- ATTENTION: The 'v-for' must really be in the template! -->
         <template v-else v-for="(child, index) of data.children">
-            <component :is="getComponentClass(child)" :data="child" :style="inlineStyle(index)" />
+            <component :is="getComponentClass(child)" :data="child" :style="getNodeInlineStyle(index)" />
         </template>
         <!--#################### END subdivision view #########################-->
 
@@ -183,7 +181,7 @@ export default class SupergridNodeView extends Vue {
     }
 
 
-    inlineStyle(index: number) {
+    getNodeInlineStyle(index: number) {
 
         let size = (index == 0) ? this.data.divider * 100 : (1 - this.data.divider) * 100;
 
@@ -198,6 +196,27 @@ export default class SupergridNodeView extends Vue {
     }
 
 
+    getPanelInlineStyle(panel: SupergridPanel): string {
+
+        if (this.data.activeTab == panel) {
+            return "display:block;";
+        }
+        return "display:none";
+    }
+
+
+    getTabInlineStyle(panel: SupergridPanel): string {
+
+        let result = "";
+
+        if (typeof panel.iconUrl != "undefined") {
+            result += "background-image:url('" + panel.iconUrl + "');";
+            result += "padding-left:1.7em"
+        }
+
+        return result;
+    }
+
 
     onTabCloseClick(evt: MouseEvent, panel: SupergridPanel) {
         evt.preventDefault();
@@ -205,19 +224,12 @@ export default class SupergridNodeView extends Vue {
         this.data.removeChild(panel);
     }
 
+
     onTabMouseDown(evt: MouseEvent, panel: SupergridPanel) {
         evt.preventDefault();
 
         this.data.activeTab = panel;
         this.root.setDragPanel(evt, panel);
-    }
-
-    tabInlineStyle(panel: SupergridPanel): string {
-
-        if (this.data.activeTab == panel) {
-            return "display:block;";
-        }
-        return "display:none";
     }
 }
 </script>
@@ -259,6 +271,10 @@ div.vuety-supergrid-node {
             padding: 0;
 
             >li {
+                background-size: 1em;
+                background-repeat: no-repeat;
+                background-position: 0.4em 0.3em;
+
                 background-color: #f0f0f0;
                 border-radius: 5px 5px 0 0;
 
