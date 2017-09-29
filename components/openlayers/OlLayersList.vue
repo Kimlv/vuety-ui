@@ -47,8 +47,12 @@ export default class OlLayersList extends Vue {
         // TODO: 2 Make this dynamic
 
         let l = <any>layer;
-        return l.controlComp;
-        //  return "olala-wms-layer-series-animation-layer-control";
+
+        if (typeof l.className == "undefined") {
+            return "";
+        }
+
+        return l.className + "-control";
 
     }
 

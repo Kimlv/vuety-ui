@@ -7,15 +7,15 @@
 
 <script lang="ts" id="supergrid-root-view">
 
-// TODO: 2 Convert insert mode to enum
-
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
-
 import { SupergridNode } from './SupergridNode'
 import { SupergridPanel } from './SupergridPanel'
-
 import SupergridNodeView from './SupergridNodeView.vue'
 import SupergridPanelView from './SupergridPanelView.vue'
+
+export enum InsertMode {
+    bottom,center,left,right,top
+}
 
 @Component({
     components: {
@@ -34,21 +34,20 @@ export default class SupergridRootView extends Vue {
     // NOTE: pDragPanel must be initialized!!
     pDragPanel: SupergridPanel | null = null;
 
-
-    insertMode: string = "top";
+    insertMode: InsertMode = InsertMode.top;
 
     dragOffsetX: number = 0;
     dragOffsetY: number = 0;
 
     fooX: number = 0;
     fooY: number = 0;
-    fooPanel: SupergridPanel | null = null;
+    perhapsDragPanel: SupergridPanel | null = null;
 
     resize: boolean = false;
     resizeNode: SupergridNodeView | null = null;
 
     dropBorderWidth: number = 0.25;
-    panelDragDistTolerance : number = 20;
+    panelDragDistTolerance: number = 20;
     //################# END Misc properties ###################
 
 
@@ -62,35 +61,16 @@ export default class SupergridRootView extends Vue {
 
         if (v != null) {
 
-
             this.resizeNode = null;
             this.resize = false;
 
             this.pDragPanel = v;
 
-
-            this.mover.style.display = 'block';
-            //  this.pDragPanel.rootDiv.classList.add('dragged');
-
-            //########## BEGIN Update mover style #############
-            /*
-            let div = this.pDragPanel.rootDiv;
- 
-             
-             this.mover.style.width = div.offsetWidth + 'px';
-             this.mover.style.height = div.offsetHeight + 'px';
-             this.mover.style.left = div.offsetLeft + 'px';
-             this.mover.style.top = div.offsetTop + 'px';
-             */
-            //########## END Update mover style #############
+            this.mover.style.display = 'block';           
         }
         else {
-            if (this.pDragPanel != null) {
-                //     this.pDragPanel.rootDiv.classList.remove('dragged');
-            }
 
             this.pDragPanel = v;
-
             this.mover.style.display = 'none';
         }
     }
@@ -123,10 +103,10 @@ export default class SupergridRootView extends Vue {
         let a = Math.abs(this.fooX - evt.offsetX);
         let b = Math.abs(this.fooY - evt.offsetY);
 
-        if (Math.sqrt(a * a + b * b) > this.panelDragDistTolerance && this.fooPanel != null) {
+        if (Math.sqrt(a * a + b * b) > this.panelDragDistTolerance && this.perhapsDragPanel != null) {
             console.log("Start drag");
-            this.dragPanel = this.fooPanel;
-            this.fooPanel = null;
+            this.dragPanel = this.perhapsDragPanel;
+            this.perhapsDragPanel = null;
         }
         //################ END Tab @mousedown prevent drag start tolerance ##############
 
@@ -154,31 +134,12 @@ export default class SupergridRootView extends Vue {
         // ATTENTION: getPanelUnder() must be called HERE to show the resize cursor!!!
         let panelUnderMouse = <SupergridNodeView | null>this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
 
-        if (this.dragPanel == null) {
+        if (this.dragPanel == null || panelUnderMouse == null) {
             return;
         }
-
-        //############ BEGIN Update mover size and position ###############
-
-        // NOTE: Updating mover width and height here is REQUIRED because it is changed by "snapping".
-        //  this.mover.style.width = this.dragPanel.rootDiv.offsetWidth + 'px';
-        //this.mover.style.height = this.dragPanel.rootDiv.offsetHeight + 'px';
-
-        this.mover.style.left = (evt.clientX - this.dragOffsetX) + 'px';
-        this.mover.style.top = (evt.clientY - this.dragOffsetY) + 'px';
-        //############ END Update mover size and position ###############
-
-
-        //########### BEGIN If we are at a valid drop location, highlight new sibling and update mover ############
-
-        this.insertMode = '';
-
-        // TODO: 2 Reimplement this
-        if (panelUnderMouse == null) {
-
-            return;
-        }
-
+        
+        //########### BEGIN If we are at a valid drop location, highlight drop location ############
+        
         let div = panelUnderMouse.rootDiv;
 
         let blax = div.offsetWidth * this.dropBorderWidth;
@@ -193,7 +154,7 @@ export default class SupergridRootView extends Vue {
             this.mover.style.width = div.offsetWidth / 2 + 'px';
             this.mover.style.height = div.offsetHeight + 'px';
 
-            this.insertMode = "left";
+            this.insertMode = InsertMode.left;
         }
 
         else if (evt.clientX > div.offsetLeft + div.offsetWidth - blax) {
@@ -203,7 +164,7 @@ export default class SupergridRootView extends Vue {
             this.mover.style.width = div.offsetWidth / 2 + 'px';
             this.mover.style.height = div.offsetHeight + 'px';
 
-            this.insertMode = "right";
+            this.insertMode = InsertMode.right;
         }
 
         else if (evt.clientY < div.offsetTop + blay) {
@@ -212,7 +173,7 @@ export default class SupergridRootView extends Vue {
             this.mover.style.width = div.offsetWidth + 'px';
             this.mover.style.height = div.offsetHeight / 2 + 'px';
 
-            this.insertMode = "top";
+            this.insertMode = InsertMode.top;
         }
 
         else if (evt.clientY > div.offsetTop + div.offsetHeight - blay) {
@@ -221,7 +182,7 @@ export default class SupergridRootView extends Vue {
             this.mover.style.width = div.offsetWidth + 'px';
             this.mover.style.height = div.offsetHeight / 2 + 'px';
 
-            this.insertMode = "bottom";
+            this.insertMode = InsertMode.bottom;
         }
         else {
             this.mover.style.left = (div.offsetLeft) + 'px';
@@ -229,15 +190,16 @@ export default class SupergridRootView extends Vue {
             this.mover.style.width = div.offsetWidth + 'px';
             this.mover.style.height = div.offsetHeight + 'px';
 
-            this.insertMode = "center";
+            this.insertMode = InsertMode.center;
         }
-        //########### END If we are at a valid drop location, highlight new sibling and update mover ############
+        //########### END If we are at a valid drop location, highlight drop location ############
     }
+
 
     onMouseUp(evt: MouseEvent) {
 
         this.resize = false;
-        this.fooPanel = null;
+        this.perhapsDragPanel = null;
 
         //########################### BEGIN Drop drag panel #############################
         if (this.dragPanel == null) {
@@ -247,42 +209,26 @@ export default class SupergridRootView extends Vue {
         let dragPanel = this.dragPanel;
         this.dragPanel = null;
 
-        let dragPanelOldParent = dragPanel.parent;
-
-
-
-        if (['bottom', 'center', 'left', 'right', 'top'].indexOf(this.insertMode) < 0) {
-            console.log("Invalid insert mode: " + this.insertMode);
-            return;
-        }
-
         let dropNodeView: SupergridNodeView | null = this.nodeView.getPanelUnder(evt.clientX, evt.clientY);
 
-
         if (dropNodeView == null) {
-            console.log("No drop node!");
+            // No drop node!            
             return;
         }
 
         let dropNode = dropNodeView.data;
 
         if (dropNode == dragPanel.parent && dropNode.children.length == 1) {
-            console.log("drop on self!");
+            // Drop on self!
             return;
         }
 
 
-        if (this.insertMode == 'center') {
-
-
-
+        if (this.insertMode == InsertMode.center) {
             dropNode.addChild(dragPanel);
             dropNode.activeTab = dragPanel;
         }
         else {
-
-
-
 
             if (dropNode.parent == null) {
 
@@ -304,63 +250,52 @@ export default class SupergridRootView extends Vue {
             dropNode.parent.children[si] = grandparent;
             grandparent.parent = dropNode.parent;
 
-
             grandparent.addChild(dropNode);
             dropNode.parent = grandparent;
 
             let newParent = new SupergridNode();
 
             // TODO: 1 Understand why we need this to avoid layout bugs
-
-
             newParent.addChild(dragPanel);
             newParent.parent = grandparent;
 
 
             switch (this.insertMode) {
 
-                case 'bottom':
+                case InsertMode.bottom:
                     grandparent.dir = 'col';
                     grandparent.addChild(newParent, false);
                     break;
 
-                case 'left':
+                case InsertMode.left:
                     grandparent.dir = 'row';
                     grandparent.addChild(newParent, true);
                     break;
 
-                case 'right':
+                case InsertMode.right:
                     grandparent.dir = 'row';
                     grandparent.addChild(newParent, false);
                     break;
 
-                case 'top':
+                case InsertMode.top:
                     grandparent.dir = 'col';
                     grandparent.addChild(newParent, true);
                     break;
             }
-
-
         }
 
-
         this.data.cleanup();
-
-
-        //if (this.pDragNodeView != null) this.pDragNodeView.$parent.$forceUpdate();
 
         // Important!
         dropNodeView.$parent.$forceUpdate();
         //########################### END Drop drag panel #############################
-
-
     }
 
     setDragPanel(evt: MouseEvent, panel: SupergridPanel | null) {
         this.dragPanel = null;
         this.fooX = evt.offsetX;
         this.fooY = evt.offsetY;
-        this.fooPanel = panel;
+        this.perhapsDragPanel = panel;
     }
 }
 </script>
@@ -377,7 +312,7 @@ div.vuety-supergrid-root {
         display: none;
         position: fixed;
         cursor: move;
-        z-index:99;
+        z-index: 999;
     }
 }
 </style>

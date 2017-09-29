@@ -46,6 +46,18 @@ export class SupergridNode {
         return result;
     }
 
+    get childNodes(): Array<SupergridNode> {
+        let result: Array<SupergridNode> = [];
+
+        for (let child of this.children) {
+            if (child instanceof SupergridNode) {
+                result.push(child);
+            }
+        }
+
+        return result;
+    }
+
 
     get root(): SupergridNode {
 
@@ -62,6 +74,11 @@ export class SupergridNode {
 
     addChild(child: SupergridNode | SupergridPanel, front: boolean = false): SupergridNode | SupergridPanel {
       
+        if (this.childNodes.length >= 2) {
+            console.error("Supergrid: A node is not allowed to have more than two child nodes (not panels!)");
+            return child;
+        }
+
         if (child.parent != null) {
             child.parent.removeChild(child);
         }
