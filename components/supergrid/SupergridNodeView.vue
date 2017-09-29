@@ -7,11 +7,12 @@
         <div class="tabs" v-if="data.childPanels.length > 0">
 
             <ul role="tablist">
-                <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)" :style="getTabInlineStyle(panel)">
-                    <span @mousedown="onTabMouseDown($event, panel)">
+                <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)" :style="getTabInlineStyle(panel)"
+                @mousedown="onTabMouseDown($event, panel)">
+                    
 
-                        <span>{{panel.title}}</span>
-                    </span>
+                        {{panel.title}}
+                    
                     <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)"></span>
                 </li>
             </ul>
@@ -302,7 +303,12 @@ div.vuety-supergrid-node {
 
                 .close {
                     background-image: url("./close.svg");
-                    background-size: 100% 100%;
+                    background-size: 90% 90%;
+                    background-repeat:no-repeat;
+                    background-position:bottom;
+                    cursor:pointer;
+                    
+                    
                     width: 16px;
                     height: 16px;
                     display: inline-block;

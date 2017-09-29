@@ -14,13 +14,10 @@ export class SupergridPanel {
         this.componentProps = options.componentProps;
         this.iconUrl = options.iconUrl;
         this.title = options.title;
-        
+
+        if (typeof options.isCloseable != "undefined") {
+            this.isCloseable = options.isCloseable;
+        }
     }    
-/*    
-    constructor(title: string, componentName: string = "", componentProps = {}) {
-        this.title = title;
-        this.componentName = componentName;
-        this.componentProps = componentProps;
-    }    
-    */
+
 }
