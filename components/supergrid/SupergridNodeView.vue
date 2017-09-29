@@ -9,7 +9,9 @@
             <ul role="tablist">
                 <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)">
 
-                    <span @mousedown="onTabMouseDown($event, panel)">{{panel.title}}</span>
+                    <span @mousedown="onTabMouseDown($event, panel)">
+                        <img v-if="panel.iconUrl != ''" :src="panel.iconUrl" style="height:1.2em;margin-right:0.3em;vertical-align:bottom" />{{panel.title}}
+                    </span>
                     <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)">
 
                     </span>
@@ -22,7 +24,6 @@
             </template>
         </div>
         <!--#################### END Stacked (tabs) view #########################-->
-
 
         <!--#################### BEGIN subdivision view #########################-->
         <!-- ATTENTION: The 'v-for' must really be in the template! -->
@@ -228,8 +229,7 @@ div.vuety-supergrid-node {
     display: flex;
     flex: 1; // Important!
     flex-basis: auto; // Important!
-    min-height:0; // ATTENTION: 'min-height:0' is required for "overflow:auto/scroll" on child elements to work in Firefox!!!
-
+    min-height: 0; // ATTENTION: 'min-height:0' is required for "overflow:auto/scroll" on child elements to work in Firefox!!!
     &.col {
         flex-direction: column;
     }
@@ -240,9 +240,9 @@ div.vuety-supergrid-node {
 
     >div.tabs {
         border: 1px solid #bbb;
-            
+
         display: flex;
-        flex-direction: column;        
+        flex-direction: column;
         height: 100%;
         width: 100%;
 
@@ -257,11 +257,11 @@ div.vuety-supergrid-node {
             list-style: none;
             margin: 0;
             padding: 0;
-            
+
             >li {
                 background-color: #f0f0f0;
                 border-radius: 5px 5px 0 0;
-                
+
                 display: inline-block;
                 font-size: 1.2em;
                 margin: 0px 2px 0px 0px;
@@ -272,12 +272,12 @@ div.vuety-supergrid-node {
 
                 &.active {
                     background-color: #fff;
-                    color: #000; 
+                    color: #000;
                     cursor: move !important;
                     top: 0px;
                     padding-bottom: 11px;
-                    box-shadow: 0px 0px 6px rgba(0, 0, 0,0.7);
-                    z-index:2;
+                    box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.7);
+                    z-index: 2;
                 }
 
                 &:hover {
