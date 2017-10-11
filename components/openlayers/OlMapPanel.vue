@@ -27,7 +27,7 @@ export default class OlMapPanel extends Vue {
         // Workaround to fix map distortion when the map is embedded 
         // in a flex container and the parent element is resized:
         window.setInterval(() => {
-            //      this.map.updateSize();
+            this.map.updateSize();
         }, 500);
     }
 
