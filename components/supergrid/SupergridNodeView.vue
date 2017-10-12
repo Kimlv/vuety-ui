@@ -7,12 +7,10 @@
         <div class="tabs" v-if="data.childPanels.length > 0">
 
             <ul role="tablist">
-                <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)" :style="getTabInlineStyle(panel)"
-                @mousedown="onTabMouseDown($event, panel)">
-                    
+                <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)" @mousedown="onTabMouseDown($event, panel)">
 
-                        {{panel.title}}
-                    
+                    <h1 :style="getTabInlineStyle(panel)">{{panel.title}}</h1>
+
                     <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)"></span>
                 </li>
             </ul>
@@ -212,7 +210,7 @@ export default class SupergridNodeView extends Vue {
 
         if (typeof panel.iconUrl != "undefined") {
             result += "background-image:url('" + panel.iconUrl + "');";
-            result += "padding-left:1.7em"
+            result += "padding-left:1.3em";
         }
 
         return result;
@@ -272,15 +270,15 @@ div.vuety-supergrid-node {
             padding: 0;
 
             >li {
-                background-size: 1em;
-                background-repeat: no-repeat;
-                background-position: 0.4em 0.3em;
 
-                background-color: #f0f0f0;
+
+
+                background-color: #efefef;
+                
                 border-radius: 5px 5px 0 0;
 
                 display: inline-block;
-                font-size: 1.2em;
+
                 margin: 0px 2px 0px 0px;
                 padding: 6px 8px;
                 position: relative;
@@ -289,7 +287,7 @@ div.vuety-supergrid-node {
 
                 &.active {
                     background-color: #fff;
-                    color: #000;
+                    color: #44b;
                     cursor: move !important;
                     top: 0px;
                     padding-bottom: 11px;
@@ -304,16 +302,26 @@ div.vuety-supergrid-node {
                 .close {
                     background-image: url("./close.svg");
                     background-size: 90% 90%;
-                    background-repeat:no-repeat;
-                    background-position:bottom;
-                    cursor:pointer;
-                    
-                    
+                    background-repeat: no-repeat;
+                    background-position: bottom;
+                    cursor: pointer;
+
+
                     width: 16px;
                     height: 16px;
                     display: inline-block;
                     margin-bottom: 0px;
                     margin-left: 2px;
+                }
+
+                >h1 {
+                    background-size: 1em;
+                    background-repeat: no-repeat;
+                    background-position: left center;
+                    font-size: 1.1em;
+                    font-weight:normal;                    
+                    margin: 0;
+                    padding: 0;
                 }
             }
         }
