@@ -5,9 +5,14 @@
                 <h3>{{layer.get('title')}}</h3>
                 <div class="layerSettings">
 
-                    Sichtbarkeit:
+                    Sichtbar:
+                    <input type="checkbox" :checked="layer.getVisible()" @click="onCheckboxClick(layer, $event)" /><br/>
+
+                    Transparenz:
                     <input type="range" min="0" max="1" step="0.01" :value="layer.getOpacity()" @input="onLayerOpacitySliderInput(layer, $event)" />
                     <br />
+
+                    
 
                     <component :is="getLayerControlComponentType(layer)" :layer="layer" />
                 </div>
@@ -57,8 +62,10 @@ export default class OlLayersList extends Vue {
 
     onCheckboxClick(layer: ol.layer.Base, evt: MouseEvent) {
 
-        let val = !layer.getVisible();
-        layer.setVisible(val);
+let elem = <HTMLInputElement> evt.target;
+
+
+        layer.setVisible(elem.checked);
     }
 
     onButtonFitExtentClick(layer: ol.layer.Base, evt: MouseEvent) {
@@ -70,6 +77,8 @@ export default class OlLayersList extends Vue {
 
         }
     }
+
+    
 
     onLayerOpacitySliderInput(layer: ol.layer.Base, evt: MouseEvent) {
         let elem = <HTMLInputElement>evt.target;
