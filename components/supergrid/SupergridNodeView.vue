@@ -105,20 +105,23 @@ export default class SupergridNodeView extends Vue {
 
         //#################### BEGIN Update active resize node #######################
         // Horizontal:
-        let foo = (x - (this.rootDiv.offsetLeft + this.rootDiv.offsetWidth * this.data.divider));
 
+        if (this.data.childNodes.length > 1) {
+            let foo = (x - (this.rootDiv.offsetLeft + this.rootDiv.offsetWidth * this.data.divider));
 
-        if (Math.abs(foo) < this.resizeHandleWidth && this.data.dir == "row") {
-            this.root.resizeNode = this;
-            this.root.rootDiv.style.cursor = "ew-resize";
-        }
+            if (Math.abs(foo) < this.resizeHandleWidth && this.data.dir == "row") {
+                this.root.resizeNode = this;
+                this.root.rootDiv.style.cursor = "ew-resize";
+            }
 
-        // Vertical:
-        let foo2 = (y - (this.rootDiv.offsetTop + this.rootDiv.offsetHeight * this.data.divider));
+            // Vertical:
+            let foo2 = (y - (this.rootDiv.offsetTop + this.rootDiv.offsetHeight * this.data.divider));
 
-        if (Math.abs(foo2) < this.resizeHandleWidth && this.data.dir == "col") {
-            this.root.resizeNode = this;
-            this.root.rootDiv.style.cursor = "ns-resize";
+            
+            if (Math.abs(foo2) < this.resizeHandleWidth && this.data.dir == "col") {
+                this.root.resizeNode = this;
+                this.root.rootDiv.style.cursor = "ns-resize";
+            }
         }
         //#################### END Update active resize node #######################
 
@@ -300,7 +303,7 @@ div.vuety-supergrid-node {
                 }
 
                 .close {
-                    background-image: url("./close.svg");
+                    background-image: url("/images/close.svg");
                     background-size: 90% 90%;
                     background-repeat: no-repeat;
                     background-position: bottom;
