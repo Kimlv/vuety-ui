@@ -9,9 +9,9 @@
             <ul role="tablist">
                 <li v-for="(panel, index) in data.childPanels" :class="getPanelCssClass(panel)" @mousedown="onTabMouseDown($event, panel)">
 
-                    <h1 :style="getTabInlineStyle(panel)">{{panel.title}}</h1>
+                    <h1 :style="getTabInlineStyle(panel)">{{panel.title}} <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)"></span></h1>
 
-                    <span v-if="panel.isCloseable" class="close" @click="onTabCloseClick($event, panel)"></span>
+                    
                 </li>
             </ul>
 
