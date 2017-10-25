@@ -26,7 +26,6 @@ import {
 
 // Import OpenLayers code and CSS:
 import * as ol from "openlayers";
-import "openlayers/css/ol.css";
 
 @Component({})
 export default class OlMapPanel extends Vue {
@@ -59,16 +58,14 @@ export default class OlMapPanel extends Vue {
   }
 
   onButtonStartClick(evt: MouseEvent) {
-      this.recorder.reset();
-      
+    this.recorder.reset();
+
     this.recorder.startRecording();
     this.recording = true;
     console.log("Recording started!");
   }
 
   onButtonStopClick(evt: MouseEvent) {
-    
-    
     this.recorder.stopRecording((url: string) => {
       this.recording = false;
       console.log(url);
@@ -86,8 +83,6 @@ div.vuety-ol-map-recorder {
 
   p.recording {
     color: #f00;
-  }
-  ul {
   }
 }
 </style>
