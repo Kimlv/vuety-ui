@@ -29,38 +29,11 @@ export default class OlMapPanel extends Vue {
     window.setInterval(() => {
       this.map.updateSize();
     }, 500);
-
-    
   }
 
   mounted() {
     // Attach map to targe div:
     this.map.setTarget(<Element>this.$refs.mapDiv);    
-/*
-    this.map.on('postcompose', (event : ol.events.Event) => {
-        
-        if (this.postcomposeCanvas != event.context.canvas) {
-            console.log("canvas update!");
-            this.postcomposeCanvas = event.context.canvas;
-
-            this.recorder = RecordRTC(this.postcomposeCanvas, {
-            type: 'canvas',
-            showMousePointer: true
-            });
-
-            this.recorder.startRecording();
-
-            window.setTimeout(() => {
-                this.recorder.stopRecording(function(url : string) {
-                    console.log(url);
-                    
-                });
-
-            }, 30000);
-
-        }    
-    });
-    */
   }
 }
 </script>
