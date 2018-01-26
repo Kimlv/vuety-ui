@@ -76,14 +76,10 @@ span.vuety-day-month-picker {
         padding-left:28px;
         width:44px;
 
-        background-image:url("./calendar.svg");
+        background-image:url("calendar.svg");
         background-size:20px 20px;
         background-repeat:no-repeat;
-        background-position:3px center;
-        
-        &:hover {
-            cursor:pointer;
-        }
+        background-position:3px center;        
     }
 
     div.popup {
