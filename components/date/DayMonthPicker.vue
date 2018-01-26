@@ -1,11 +1,12 @@
 <template>
     <div class="vuety-day-month-picker">
+        <input type="text" @click="onClick" :value="inputFieldString" style="width:40px;" readonly="true">
+        <!--
         <span class="field" @click="onClick">{{value.getDate()}}.{{value.getMonth()+1}}</span>
-
+-->
         <div ref="popup" class="popup">
             <vt-month-dropdown v-model="month" />
             <vt-days-table v-model="date" @input="onDayInput" />
-
         </div>
     </div>
 </template>
@@ -17,6 +18,7 @@
 import { Component, Inject, Model, Prop, Vue, Watch } from 'vue-property-decorator'
 import MonthDropdown from './MonthDropdown.vue'
 import DaysTable from './DaysTable.vue'
+//import t1 from './calendar.svg'
 
 @Component({
     components: {
@@ -38,6 +40,10 @@ export default class DayMonthPicker extends Vue {
 
     set date(v: Date) {
         this.$emit('input', v);
+    }
+
+    get inputFieldString() : string {
+        return this.value.getDate() + "." +  (this.value.getMonth() +1);
     }
 
     get month(): number {
@@ -73,12 +79,25 @@ div.vuety-day-month-picker {
     // NOTE: 'inline-block' (as opposed to 'inline') is required
     // to set the horizontal position of the absolutely positioned popup to
     // the horizontal position of the "input field"
-    display: inline-block;
+    
 
     span.field {
         background-color: #fff;
-        border: 2px inset;
+        
+        
+        display: inline-block;    
         padding: 2px;
+        padding-left:24px;
+        width:48px;
+
+        background-image:url("./calendar.svg");
+        background-size:20px 20px;
+        background-repeat:no-repeat;
+        background-position:2px center;
+        
+        &:hover {
+            cursor:pointer;
+        }
     }
     div.popup {
         position: fixed;
