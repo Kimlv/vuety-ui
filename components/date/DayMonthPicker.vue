@@ -39,7 +39,7 @@ export default class DayMonthPicker extends Vue {
     }
 
     get inputFieldString() : string {
-        return this.value.getDate() + "." +  (this.value.getMonth() +1);
+        return this.pad(this.value.getDate(),2) + "." +  this.pad((this.value.getMonth() +1 ), 2);
     }
 
     get month(): number {
@@ -56,6 +56,7 @@ export default class DayMonthPicker extends Vue {
         this.date = new Date(this.value.getTime());
     }
 
+    //#################### BEGIN Event handlers ####################
     onClick() {
         let popup = <HTMLDivElement>this.$refs.popup;
         popup.style.display = 'block';
@@ -66,6 +67,14 @@ export default class DayMonthPicker extends Vue {
         let popup = <HTMLDivElement>this.$refs.popup;
         popup.style.display = 'none';
     }
+    //#################### END Event handlers ####################
+
+    pad(num: number, size: number) : string {
+        let s = num.toString();
+        while (s.length < size) s = "0" + s;
+        return s;
+    }
+
 }
 </script>
 
