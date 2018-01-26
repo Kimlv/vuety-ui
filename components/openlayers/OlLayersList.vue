@@ -145,13 +145,13 @@ div.vuety-ol-layers-list {
         }
 
         > h3 {
-          background-image: url("/images/arrow-right.svg");
+          background-image: url("arrow-right.svg");
         }
       }
 
       &.show {
         > h3 {
-          background-image: url("/images/arrow-down.svg");
+          background-image: url("arrow-down.svg");
         }
       }
     }
